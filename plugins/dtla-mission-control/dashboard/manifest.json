@@ -1,0 +1,15 @@
+{
+  "name": "dtla-mission-control",
+  "label": "DTLA Mission Control",
+  "description": "Slot-only neon cockpit HUD for the DTLA Hermes dashboard theme.",
+  "icon": "Sparkles",
+  "version": "1.0.0",
+  "tab": {
+    "path": "/dtla-mission-control",
+    "position": "end",
+    "hidden": true
+  },
+  "slots": ["sidebar", "pre-main", "header-left", "header-right"],
+  "entry": "dist/index.js",
+  "css": "dist/style.css"
+}

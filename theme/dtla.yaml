@@ -1,0 +1,135 @@
+# DTLA — Hermes dashboard theme + cockpit HUD companion
+# Copy to ~/.hermes/dashboard-themes/dtla.yaml and pair with the
+# dtla-mission-control dashboard plugin for the full hackathon build.
+name: dtla
+label: "DTLA"
+description: "Downtown Los Angeles night-mode dashboard: black glass, millennial pink, electric blue, and violet glow."
+
+palette:
+  background:
+    hex: "#050508"
+    alpha: 1.0
+  midground:
+    hex: "#F6EAF2"
+    alpha: 1.0
+  foreground:
+    hex: "#55C7FF"
+    alpha: 0.72
+  warmGlow: "rgba(243, 166, 200, 0.22)"
+  noiseOpacity: 0.82
+
+typography:
+  fontSans: '"Space Grotesk", "Inter", system-ui, sans-serif'
+  fontMono: '"JetBrains Mono", "SFMono-Regular", ui-monospace, monospace'
+  fontDisplay: '"Space Grotesk", "Inter", system-ui, sans-serif'
+  fontUrl: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+  baseSize: "14px"
+  lineHeight: "1.55"
+  letterSpacing: "0.012em"
+
+layout:
+  radius: "0.85rem"
+  density: "comfortable"
+
+# Cockpit mode reserves a left rail for the companion plugin's sidebar HUD.
+layoutVariant: cockpit
+
+assets:
+  bg: "radial-gradient(circle at 18% 12%, rgba(243, 166, 200, 0.18), transparent 28%), radial-gradient(circle at 82% 8%, rgba(85, 199, 255, 0.14), transparent 26%), radial-gradient(circle at 50% 92%, rgba(124, 92, 255, 0.18), transparent 34%), linear-gradient(135deg, #050508 0%, #0B0B14 48%, #120A1D 100%)"
+  hero: "radial-gradient(circle at 50% 18%, rgba(85, 199, 255, 0.55), transparent 18%), linear-gradient(155deg, rgba(243, 166, 200, 0.12), rgba(124, 92, 255, 0.18) 48%, rgba(5, 5, 8, 0.84)), repeating-linear-gradient(90deg, rgba(85, 199, 255, 0.16) 0 1px, transparent 1px 22px)"
+  crest: "radial-gradient(circle, rgba(85, 199, 255, 0.45), rgba(124, 92, 255, 0.20) 42%, transparent 70%)"
+  custom:
+    skyline: "linear-gradient(180deg, transparent 0 42%, rgba(85, 199, 255, 0.12) 43% 45%, transparent 46%), repeating-linear-gradient(90deg, transparent 0 18px, rgba(243, 166, 200, 0.10) 19px 20px, transparent 21px 42px)"
+
+componentStyles:
+  card:
+    background: "linear-gradient(180deg, rgba(16, 16, 26, 0.90) 0%, rgba(5, 5, 8, 0.96) 100%)"
+    borderColor: "rgba(243, 166, 200, 0.24)"
+    boxShadow: "inset 0 0 0 1px rgba(243, 166, 200, 0.18), 0 0 34px rgba(124, 92, 255, 0.10)"
+    backdropFilter: "blur(18px) saturate(1.15)"
+  header:
+    background: "linear-gradient(180deg, rgba(10, 10, 18, 0.97) 0%, rgba(5, 5, 8, 0.90) 100%)"
+    borderColor: "rgba(85, 199, 255, 0.24)"
+    boxShadow: "0 1px 0 rgba(85, 199, 255, 0.18), 0 16px 46px rgba(5, 5, 8, 0.38)"
+  sidebar:
+    background: "linear-gradient(180deg, rgba(12, 10, 22, 0.92) 0%, rgba(5, 5, 8, 0.92) 100%)"
+    borderColor: "rgba(243, 166, 200, 0.24)"
+    boxShadow: "inset -1px 0 0 rgba(85, 199, 255, 0.16), 16px 0 44px rgba(5, 5, 8, 0.34)"
+  tab:
+    background: "linear-gradient(180deg, rgba(243, 166, 200, 0.10), rgba(124, 92, 255, 0.08))"
+    borderColor: "rgba(243, 166, 200, 0.22)"
+  badge:
+    background: "rgba(124, 92, 255, 0.18)"
+    borderColor: "rgba(85, 199, 255, 0.24)"
+  progress:
+    background: "linear-gradient(90deg, #F3A6C8 0%, #7C5CFF 52%, #55C7FF 100%)"
+  backdrop:
+    backgroundSize: "cover"
+    backgroundPosition: "center"
+    fillerOpacity: "1"
+    fillerBlendMode: "screen"
+  footer:
+    background: "linear-gradient(0deg, rgba(5, 5, 8, 0.95), rgba(5, 5, 8, 0.78))"
+  page:
+    background: "transparent"
+
+colorOverrides:
+  card: "rgba(16, 16, 26, 0.92)"
+  cardForeground: "#F6EAF2"
+  popover: "rgba(12, 12, 20, 0.98)"
+  popoverForeground: "#F6EAF2"
+  primary: "#F3A6C8"
+  primaryForeground: "#050508"
+  secondary: "rgba(124, 92, 255, 0.20)"
+  secondaryForeground: "#F6EAF2"
+  muted: "rgba(184, 154, 166, 0.14)"
+  mutedForeground: "#B89AA6"
+  accent: "#55C7FF"
+  accentForeground: "#050508"
+  destructive: "#FF6B8A"
+  destructiveForeground: "#050508"
+  success: "#7EE0B5"
+  warning: "#C6A0FF"
+  border: "rgba(243, 166, 200, 0.24)"
+  input: "rgba(243, 166, 200, 0.18)"
+  ring: "#7C5CFF"
+
+customCSS: |
+  :root[data-layout-variant="cockpit"] body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background:
+      radial-gradient(circle at 20% 8%, rgba(243, 166, 200, 0.12), transparent 28%),
+      radial-gradient(circle at 88% 14%, rgba(85, 199, 255, 0.08), transparent 24%),
+      repeating-linear-gradient(to bottom, transparent 0px, transparent 3px, rgba(243, 166, 200, 0.016) 4px, transparent 5px);
+    mix-blend-mode: screen;
+  }
+
+  :root[data-layout-variant="cockpit"] body::after {
+    content: "";
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 34vh;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.20;
+    background:
+      linear-gradient(180deg, transparent 0%, rgba(5, 5, 8, 0.92) 100%),
+      repeating-linear-gradient(90deg, transparent 0 22px, rgba(85, 199, 255, 0.18) 23px 24px, transparent 25px 52px),
+      linear-gradient(90deg, rgba(243, 166, 200, 0.18), rgba(124, 92, 255, 0.08), rgba(85, 199, 255, 0.18));
+    clip-path: polygon(0 46%, 6% 46%, 6% 34%, 11% 34%, 11% 52%, 18% 52%, 18% 26%, 23% 26%, 23% 48%, 31% 48%, 31% 37%, 37% 37%, 37% 55%, 45% 55%, 45% 28%, 51% 28%, 51% 48%, 61% 48%, 61% 31%, 68% 31%, 68% 57%, 77% 57%, 77% 40%, 84% 40%, 84% 50%, 91% 50%, 91% 33%, 100% 33%, 100% 100%, 0 100%);
+  }
+
+  :root[data-layout-variant="cockpit"] .border-border {
+    position: relative;
+  }
+
+  :root[data-layout-variant="cockpit"] .border-border::selection {
+    background: rgba(243, 166, 200, 0.32);
+    color: #050508;
+  }

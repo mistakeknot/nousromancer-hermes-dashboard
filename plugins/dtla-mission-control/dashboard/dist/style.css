@@ -46,13 +46,6 @@
   background: rgba(85, 199, 255, 0.08) !important;
 }
 
-.dtla-pre-main-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-
 .dtla-now-bar {
   align-items: center;
   display: grid;
@@ -117,96 +110,8 @@
   color: #55c7ff;
 }
 
-.dtla-masaq-workstream {
-  border-color: rgba(126, 224, 181, 0.24);
-  background:
-    radial-gradient(circle at 100% 0%, rgba(126, 224, 181, 0.14), transparent 32%),
-    linear-gradient(180deg, rgba(16, 20, 28, 0.76), rgba(5, 5, 8, 0.86));
-  overflow: hidden;
-  padding: 0.76rem 0.84rem;
-  position: relative;
-}
-
-.dtla-masaq-kicker,
-.dtla-masaq-label,
-.dtla-masaq-action,
-.dtla-masaq-status {
-  font-family: var(--theme-font-mono, ui-monospace, monospace);
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-}
-
-.dtla-masaq-kicker {
-  color: #b89aa6;
-  font-size: 0.58rem;
-  margin-bottom: 0.32rem;
-}
-
-.dtla-masaq-heading {
-  align-items: center;
-  display: flex;
-  gap: 0.75rem;
-  justify-content: space-between;
-  margin-bottom: 0.64rem;
-}
-
-.dtla-masaq-heading > span:first-child {
-  color: #f3a6c8;
-  font-size: 0.82rem;
-  font-weight: 850;
-}
-
-.dtla-masaq-status {
-  border: 1px solid rgba(126, 224, 181, 0.32);
-  border-radius: 999px;
-  color: #7ee0b5;
-  font-size: 0.54rem;
-  padding: 0.18rem 0.46rem;
-}
-
-.dtla-masaq-grid {
-  display: grid;
-  gap: 0.34rem 0.85rem;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-}
-
-.dtla-masaq-line {
-  min-width: 0;
-}
-
-.dtla-masaq-label {
-  color: #b89aa6;
-  display: block;
-  font-size: 0.54rem;
-  margin-bottom: 0.08rem;
-}
-
-.dtla-masaq-value {
-  color: #f6eaf2;
-  display: block;
-  font-size: 0.68rem;
-  font-weight: 650;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.dtla-masaq-value--strong {
-  color: #55c7ff;
-  font-weight: 800;
-}
-
-.dtla-masaq-action {
-  border-top: 1px solid rgba(85, 199, 255, 0.12);
-  color: #7ee0b5;
-  font-size: 0.61rem;
-  margin-top: 0.62rem;
-  padding-top: 0.48rem;
-}
-
 @media (max-width: 900px) {
-  .dtla-now-bar,
-  .dtla-masaq-grid {
+  .dtla-now-bar {
     grid-template-columns: 1fr;
   }
 }

@@ -5,7 +5,7 @@ DTLA is a minimal noir operations skin for Hermes Agent: black glass, millennial
 - Theme: `theme/dtla.yaml`
 - Plugin: `plugins/dtla-mission-control/`
 
-The theme keeps the dashboard in the standard layout to avoid sidebar collisions with other installed plugins. The companion plugin adds a persistent Now Bar above every page: gateway health, active runs, latest trace, and the next useful action in one restrained strip. It also adds a small header crest, night-ops status pill, and a public-safe Masaq workstream card for private ops-plane handoff handles.
+The theme keeps the dashboard in the standard layout to avoid sidebar collisions with other installed plugins. The companion plugin adds a persistent Now Bar above every page: gateway health, active runs, latest trace, and the next useful action in one restrained strip. It also adds a small header crest and night-ops status pill.
 
 ## Install
 
@@ -21,7 +21,7 @@ Then open the dashboard, click the palette icon, and select `DTLA`.
 If the dashboard is already running, force plugin discovery without restart:
 
 ```bash
-curl http://127.0.0.1:9119/api/dashboard/plugins/rescan
+curl --max-time 3 -fsS http://127.0.0.1:9119/api/dashboard/plugins/rescan
 ```
 
 ## Manual install
@@ -42,12 +42,6 @@ Refresh `hermes dashboard`, select `DTLA`, and the Now Bar appears above each pa
 - A persistent Now Bar that keeps gateway health, active runs, latest trace, and the next useful action visible across routes.
 - Live data from `SDK.api.getStatus()` and `SDK.api.getSessions()`.
 - Theme/plugin composition without forking Hermes or running an npm build.
-- A Masaq workstream card that binds a chat surface, Beads issue, repo, next action, and evidence handle without adding write authority.
-
-## Masaq workstream convention
-
-Use `Discord thread title + Beads ID` as the public-safe handle for chat-to-dashboard links. Do not store raw Discord channel IDs or thread IDs in this plugin, screenshots, public docs, or any public-adjacent export. Private runtime registries can hold those IDs later if a retention policy explicitly allows it.
-
 ## Files
 
 ```text

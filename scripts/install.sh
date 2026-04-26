@@ -16,7 +16,7 @@ if command -v hermes >/dev/null 2>&1; then
 fi
 
 if command -v curl >/dev/null 2>&1; then
-  curl -fsS http://127.0.0.1:9119/api/dashboard/plugins/rescan >/dev/null 2>&1 || true
+  curl --max-time 3 -fsS http://127.0.0.1:9119/api/dashboard/plugins/rescan >/dev/null 2>&1 || true
 fi
 
 echo "Installed. Start or refresh: hermes dashboard"

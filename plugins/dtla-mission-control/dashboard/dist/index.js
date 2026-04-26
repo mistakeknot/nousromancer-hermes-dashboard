@@ -18,16 +18,6 @@
   const api = SDK.api || {};
   const h = React.createElement;
   const NAME = "dtla-mission-control";
-  const MASAQ_WORKSTREAM = {
-    title: "Masaq workstream",
-    conversation: "Discord thread · GSV / Masaq planning",
-    bead: "generalsystemsventures-5k5",
-    repo: "gensysven/generalsystemsventures",
-    status: "prototype",
-    nextAction: "Prototype dashboard workstream card",
-    evidence: "docs/ops/masaq-interaction-model.md",
-    action: "Prepare dispatch packet",
-  };
 
   function recentTitle(session) {
     if (!session) return "Untitled session";
@@ -128,36 +118,6 @@
     );
   }
 
-  function MasaqLine(props) {
-    return h(
-      "div",
-      { className: "dtla-masaq-line" },
-      h("span", { className: "dtla-masaq-label" }, props.label),
-      h("span", { className: props.strong ? "dtla-masaq-value dtla-masaq-value--strong" : "dtla-masaq-value" }, props.value),
-    );
-  }
-
-  function MasaqWorkstreamCard() {
-    const w = MASAQ_WORKSTREAM;
-    return h(
-      "section",
-      { className: "dtla-surface dtla-hud-card dtla-masaq-workstream", "aria-label": "Masaq workstream" },
-      h("div", { className: "dtla-masaq-kicker" }, "Masaq / workstream spine"),
-      h("div", { className: "dtla-masaq-heading" },
-        h("span", { className: "dtla-neon-text" }, w.title),
-        h("span", { className: "dtla-masaq-status" }, w.status),
-      ),
-      h("div", { className: "dtla-masaq-grid" },
-        h(MasaqLine, { label: "chat", value: w.conversation, strong: true }),
-        h(MasaqLine, { label: "bead", value: w.bead, strong: true }),
-        h(MasaqLine, { label: "repo", value: w.repo }),
-        h(MasaqLine, { label: "next", value: w.nextAction }),
-        h(MasaqLine, { label: "evidence", value: w.evidence }),
-      ),
-      h("div", { className: "dtla-masaq-action" }, w.action),
-    );
-  }
-
   function PreMainSlot() {
     const data = useMissionData();
     const status = data.status;
@@ -171,17 +131,12 @@
 
     return h(
       "div",
-      { className: "dtla-pre-main-stack" },
-      h(
-        "div",
-        { className: "dtla-surface dtla-hud-card dtla-now-bar" },
-        h("div", { className: "dtla-now-label" }, "Now"),
-        h(NowItem, { tone: gatewayLive ? "live" : "warn" }, gatewayLive ? "Gateway live" : "Gateway offline"),
-        h(NowItem, { tone: count ? "active" : "muted" }, count + " active"),
-        h("span", { className: "dtla-now-trace", title: latestTitle }, "Last trace: ", latestTitle),
-        h(NowAction, { href: actionHref }, actionLabel, " →"),
-      ),
-      h(MasaqWorkstreamCard),
+      { className: "dtla-surface dtla-hud-card dtla-now-bar" },
+      h("div", { className: "dtla-now-label" }, "Now"),
+      h(NowItem, { tone: gatewayLive ? "live" : "warn" }, gatewayLive ? "Gateway live" : "Gateway offline"),
+      h(NowItem, { tone: count ? "active" : "muted" }, count + " active"),
+      h("span", { className: "dtla-now-trace", title: latestTitle }, "Last trace: ", latestTitle),
+      h(NowAction, { href: actionHref }, actionLabel, " →"),
     );
   }
 

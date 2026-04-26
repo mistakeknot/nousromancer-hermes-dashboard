@@ -20,27 +20,6 @@ function collectLinks(node, links = []) {
   return links;
 }
 
-function findNode(node, predicate) {
-  if (node == null || typeof node !== 'object') return null;
-  if (predicate(node)) return node;
-  for (const child of node.children || []) {
-    const match = findNode(child, predicate);
-    if (match) return match;
-  }
-  return null;
-}
-
-function collectForbiddenInteractiveProps(node, found = []) {
-  if (node == null || typeof node !== 'object') return found;
-  const props = node.props || {};
-  if (node.type === 'a' || node.type === 'button') found.push(node.type);
-  for (const key of Object.keys(props)) {
-    if (/^on[A-Z]/.test(key) || key === 'href') found.push(key);
-  }
-  for (const child of node.children || []) collectForbiddenInteractiveProps(child, found);
-  return found;
-}
-
 async function renderRegisteredSlot(slotName, missionData) {
   const source = await readFile(PLUGIN_PATH, 'utf8');
   const slots = new Map();
@@ -126,53 +105,4 @@ test('README explains the Now Bar usefulness in judge-scannable language', async
   assert.match(source, /active runs/i);
   assert.match(source, /latest trace/i);
   assert.match(source, /next useful action/i);
-});
-
-test('pre-main renders a Masaq workstream card with chat, Beads, repo, next action, and evidence handles', async () => {
-  const node = await renderRegisteredSlot('pre-main', {
-    status: { gateway_running: true, active_sessions: 1, version: '0.11.0' },
-    sessions: [{ id: 'sess-1', title: 'Prototype Masaq card', is_active: true }],
-    error: null,
-  });
-  const text = flattenText(node).join(' ');
-
-  assert.match(text, /Masaq workstream/i);
-  assert.match(text, /Discord thread/i);
-  assert.match(text, /generalsystemsventures-5k5/);
-  assert.match(text, /gensysven\/generalsystemsventures/);
-  assert.match(text, /prototype dashboard workstream card/i);
-  assert.match(text, /docs\/ops\/masaq-interaction-model\.md/);
-});
-
-test('Masaq workstream proof stays non-authoritative and avoids private Discord IDs', async () => {
-  const pluginSource = await readFile(PLUGIN_PATH, 'utf8');
-  const readmeSource = await readFile(README_PATH, 'utf8');
-  const node = await renderRegisteredSlot('pre-main');
-  const text = flattenText(node).join(' ');
-  const combined = `${pluginSource}\n${readmeSource}\n${text}`;
-
-  assert.match(text, /prepare dispatch packet/i);
-  assert.doesNotMatch(text, /git push|merge api|vercel deploy|bd create/i);
-  assert.doesNotMatch(combined, /discord(?:app)?\.com\/channels/i);
-  assert.doesNotMatch(combined, /\b\d{17,20}\b/);
-  assert.doesNotMatch(combined, /https?:\/\/[^/\s:@]+:[^/\s@]+@/i);
-  assert.doesNotMatch(combined, /(?:api[_-]?key|token|secret|password|bearer|webhook|client[_-]?secret|github_pat_|ghp_|sk-[A-Za-z0-9]|xox[baprs]-|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|ya29\.|SG\.|pypi-|npm_)/i);
-  assert.doesNotMatch(pluginSource, /channel[_-]?id\s*[:=]/i);
-  assert.doesNotMatch(pluginSource, /thread[_-]?id\s*[:=]/i);
-});
-
-test('Masaq workstream card remains a static read-only card', async () => {
-  const node = await renderRegisteredSlot('pre-main');
-  const card = findNode(node, (candidate) => candidate.props?.['aria-label'] === 'Masaq workstream');
-
-  assert.ok(card, 'Masaq workstream card exists');
-  assert.deepEqual(collectForbiddenInteractiveProps(card), []);
-});
-
-test('README documents the Masaq chat-to-dashboard handle convention without private IDs', async () => {
-  const source = await readFile(README_PATH, 'utf8');
-
-  assert.match(source, /Masaq workstream card/);
-  assert.match(source, /Discord thread title \+ Beads ID/);
-  assert.match(source, /Do not store raw Discord channel IDs or thread IDs/);
 });

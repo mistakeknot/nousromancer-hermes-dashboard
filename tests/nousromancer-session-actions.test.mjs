@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 
-const PLUGIN_PATH = new URL('../plugins/dtla-mission-control/dashboard/dist/index.js', import.meta.url);
-const CSS_PATH = new URL('../plugins/dtla-mission-control/dashboard/dist/style.css', import.meta.url);
+const PLUGIN_PATH = new URL('../plugins/nousromancer-mission-control/dashboard/dist/index.js', import.meta.url);
+const CSS_PATH = new URL('../plugins/nousromancer-mission-control/dashboard/dist/style.css', import.meta.url);
 
 function makeElement({ textContent = '', placeholder = '', attributes = {} } = {}) {
   const element = {
@@ -84,7 +84,7 @@ async function runPreMainEffectsWithDocument(fakeDocument) {
   return { observers, cleanups };
 }
 
-test('DTLA clarifies Sessions search copy and demotes repeated source/delete row chrome', async () => {
+test('Nousromancer clarifies Sessions search copy and demotes repeated source/delete row chrome', async () => {
   const input = makeElement({ placeholder: 'Search message content...' });
   const sourceBadge = makeElement({ textContent: 'discord' });
   const deleteButton = makeElement({ attributes: { 'aria-label': 'Delete session' } });
@@ -107,16 +107,16 @@ test('DTLA clarifies Sessions search copy and demotes repeated source/delete row
   const { observers, cleanups } = await runPreMainEffectsWithDocument(fakeDocument);
 
   assert.equal(input.placeholder, 'Search session text');
-  assert.equal(input.dataset.dtlaSearchPolished, 'true');
+  assert.equal(input.dataset.nousromancerSearchPolished, 'true');
   assert.equal(input.getAttribute('aria-label'), 'Search across session messages');
   assert.equal(input.getAttribute('title'), 'Search across session messages');
 
   assert.equal(sourceBadge.textContent, 'src:discord');
-  assert.equal(sourceBadge.dataset.dtlaSourceChip, 'true');
+  assert.equal(sourceBadge.dataset.nousromancerSourceChip, 'true');
   assert.equal(sourceBadge.getAttribute('aria-label'), 'Session source: discord');
   assert.equal(sourceBadge.getAttribute('title'), 'Session source: discord');
 
-  assert.equal(deleteButton.dataset.dtlaDangerAction, 'delete');
+  assert.equal(deleteButton.dataset.nousromancerDangerAction, 'delete');
   assert.equal(deleteButton.getAttribute('title'), 'Delete session');
 
   assert.equal(observers.length, 1, 'DOM polish stays attached for paginated/session updates');
@@ -126,13 +126,13 @@ test('DTLA clarifies Sessions search copy and demotes repeated source/delete row
   assert.equal(observers[0].disconnected, true, 'observer is disconnected on unmount');
 });
 
-test('DTLA CSS visually demotes source chips and destructive session row actions', async () => {
+test('Nousromancer CSS visually demotes source chips and destructive session row actions', async () => {
   const css = await readFile(CSS_PATH, 'utf8');
 
-  assert.match(css, /data-dtla-search-polished/);
-  assert.match(css, /data-dtla-source-chip/);
+  assert.match(css, /data-nousromancer-search-polished/);
+  assert.match(css, /data-nousromancer-source-chip/);
   assert.match(css, /src:discord|source chip|session source/i);
-  assert.match(css, /data-dtla-danger-action="delete"/);
+  assert.match(css, /data-nousromancer-danger-action="delete"/);
   assert.match(css, /opacity:\s*0/);
-  assert.match(css, /hover.*data-dtla-danger-action/s);
+  assert.match(css, /hover.*data-nousromancer-danger-action/s);
 });

@@ -1,8 +1,8 @@
-# DTLA — Hermes dashboard theme + Now Bar companion
-# Copy to ~/.hermes/dashboard-themes/dtla.yaml and pair with the
-# dtla-mission-control dashboard plugin for the full hackathon build.
-name: dtla
-label: "DTLA"
+# Nousromancer — Hermes dashboard theme + Now Bar companion
+# Copy to ~/.hermes/dashboard-themes/nousromancer.yaml and pair with the
+# nousromancer-mission-control dashboard plugin for the full hackathon build.
+name: nousromancer
+label: "Nousromancer"
 description: "A black technical ledger for Hermes Dashboard: ACRONYM-like labeling discipline, Veilance restraint, and operational color only where state matters."
 
 palette:

@@ -1,4 +1,4 @@
-# Oracle Review — DTLA Minimal Control Surface
+# Oracle Review — Nousromancer Minimal Control Surface
 
 Source: Oracle 0.9.0, browser mode `gpt-5.4-pro`, reviewing `docs/design-direction-minimal-control-surface.md`.
 
@@ -40,7 +40,7 @@ It addresses:
 * **dashboard noise** — too many surfaces compete for attention;
 * **trust** — a live agent dashboard must show current state continuously.
 
-The direction is compelling because it reframes DTLA from “visual theme” to **operations layer**.
+The direction is compelling because it reframes Nousromancer from “visual theme” to **operations layer**.
 
 The weak point: the current brief still spends more detail on palette, taste, and copy restraint than on the operational state model. For hackathon judging, the design should make one thing unmistakable:
 
@@ -71,7 +71,7 @@ Gateway degraded · Last trace failed 2m ago · Missing key · Fix Vault →
 Or during a live run:
 
 ```text
-Gateway live · 1 active · Running: Uploading DTLA Skin Theme · Trace →
+Gateway live · 1 active · Running: Uploading Nousromancer Skin Theme · Trace →
 ```
 
 Then the judge clicks **Trace** or **Logs**, and the dashboard opens the relevant filtered trace/log/session.
@@ -80,12 +80,12 @@ That is the moment.
 
 A strong 30-second demo sequence:
 
-1. Open Hermes Dashboard with DTLA installed.
+1. Open Hermes Dashboard with Nousromancer installed.
 2. Show the minimal black-glass theme.
 3. Start or simulate an agent run.
 4. The Now Bar updates:
    ```text
-   Gateway live · 1 active · Running: Build DTLA plugin · Trace →
+   Gateway live · 1 active · Running: Build Nousromancer plugin · Trace →
    ```
 5. Navigate to Skills or Config. The Now Bar remains visible.
 6. Trigger a failure, missing key, or gateway disconnect.
@@ -223,7 +223,7 @@ Do not overbuild destructive controls, but do give users a next step.
 
 **7. Privacy and redaction**
 
-Sessions, logs, keys, and traces can leak sensitive information. DTLA should avoid displaying secrets, raw env values, or long trace names in public screenshots.
+Sessions, logs, keys, and traces can leak sensitive information. Nousromancer should avoid displaying secrets, raw env values, or long trace names in public screenshots.
 
 Add a screenshot-safe behavior:
 
@@ -251,7 +251,7 @@ That may accidentally communicate “broken” or “empty.”
 For the main hero screenshot, use a healthy active state:
 
 ```text
-Gateway live · 1 active · Last trace: Uploading DTLA Skin Theme · Trace →
+Gateway live · 1 active · Last trace: Uploading Nousromancer Skin Theme · Trace →
 ```
 
 Use the offline/degraded state in the demo video to prove diagnostic value.
@@ -367,7 +367,7 @@ Empty/loading/stale states handled
 
 Add a concise technical note in the README:
 
-> DTLA demonstrates Hermes extensibility through theme tokens plus slot injection into `header-left`, `header-right`, `pre-main`, and sidebar surfaces.
+> Nousromancer demonstrates Hermes extensibility through theme tokens plus slot injection into `header-left`, `header-right`, `pre-main`, and sidebar surfaces.
 
 That matters because the judging pool values extension-system demonstration.
 
@@ -393,11 +393,11 @@ Do not start with skyline, glow, or elaborate sidebar chrome. The winning artifa
 
 Best version:
 
-> **DTLA uses Hermes themes and slots to keep agent state visible everywhere: gateway, active runs, last trace, and one-click logs.**
+> **Nousromancer uses Hermes themes and slots to keep agent state visible everywhere: gateway, active runs, last trace, and one-click logs.**
 
 Slightly more polished:
 
-> **DTLA turns Hermes into a calm ops console: live gateway, active runs, last trace, and logs on every page.**
+> **Nousromancer turns Hermes into a calm ops console: live gateway, active runs, last trace, and logs on every page.**
 
 More technical:
 
@@ -405,8 +405,8 @@ More technical:
 
 For the README or demo intro, I would use:
 
-> **Hermes users should not hunt across pages to know what their agent is doing. DTLA adds a persistent Now Bar that shows gateway health, active runs, latest trace, and the next useful action from every dashboard route.**
+> **Hermes users should not hunt across pages to know what their agent is doing. Nousromancer adds a persistent Now Bar that shows gateway health, active runs, latest trace, and the next useful action from every dashboard route.**
 
 Final candid assessment:
 
-**This is the right design direction.** But to win, DTLA cannot merely be the most tasteful theme. It needs to be the theme/plugin that makes Hermes feel more operable. The Now Bar is the submission. Everything else should support it.
+**This is the right design direction.** But to win, Nousromancer cannot merely be the most tasteful theme. It needs to be the theme/plugin that makes Hermes feel more operable. The Now Bar is the submission. Everything else should support it.

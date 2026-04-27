@@ -1,22 +1,22 @@
-# DTLA Hermes Dashboard
+# Nousromancer Hermes Dashboard
 
-DTLA is a minimal noir operations skin for Hermes Agent: a black technical ledger with ACRONYM-like labeling discipline, Veilance restraint, mono metadata, readable sans content, thin rules, and operational color only where state matters. It includes both hackathon tracks:
+Nousromancer is a minimal noir operations skin for Hermes Agent: a black technical ledger with ACRONYM-like labeling discipline, Veilance restraint, mono metadata, readable sans content, thin rules, and operational color only where state matters. It includes both hackathon tracks:
 
-- Theme: `theme/dtla.yaml`
-- Plugin: `plugins/dtla-mission-control/`
+- Theme: `theme/nousromancer.yaml`
+- Plugin: `plugins/nousromancer-mission-control/`
 
 The theme keeps the dashboard in the standard layout to avoid sidebar collisions with other installed plugins. The companion plugin adds a persistent Now Bar above every page: gateway health, active runs, latest trace, and the next useful action in one restrained strip. It also adds a small header crest and night-ops status pill.
 
 ## Install
 
 ```bash
-git clone https://github.com/mistakeknot/dtla-hermes-dashboard.git
-cd dtla-hermes-dashboard
+git clone https://github.com/mistakeknot/nousromancer-hermes-dashboard.git
+cd nousromancer-hermes-dashboard
 ./scripts/install.sh
 hermes dashboard
 ```
 
-Then open the dashboard, click the palette icon, and select `DTLA`.
+Then open the dashboard, click the palette icon, and select `Nousromancer`.
 
 If the dashboard is already running, force plugin discovery without restart:
 
@@ -28,11 +28,11 @@ curl --max-time 3 -fsS http://127.0.0.1:9119/api/dashboard/plugins/rescan
 
 ```bash
 mkdir -p ~/.hermes/dashboard-themes ~/.hermes/plugins
-cp theme/dtla.yaml ~/.hermes/dashboard-themes/dtla.yaml
-cp -R plugins/dtla-mission-control ~/.hermes/plugins/dtla-mission-control
+cp theme/nousromancer.yaml ~/.hermes/dashboard-themes/nousromancer.yaml
+cp -R plugins/nousromancer-mission-control ~/.hermes/plugins/nousromancer-mission-control
 ```
 
-Refresh `hermes dashboard`, select `DTLA`, and the Now Bar appears above each page.
+Refresh `hermes dashboard`, select `Nousromancer`, and the Now Bar appears above each page.
 
 ## What it demonstrates
 
@@ -46,18 +46,18 @@ Refresh `hermes dashboard`, select `DTLA`, and the Now Bar appears above each pa
 ## Files
 
 ```text
-theme/dtla.yaml
-plugins/dtla-mission-control/dashboard/manifest.json
-plugins/dtla-mission-control/dashboard/dist/index.js
-plugins/dtla-mission-control/dashboard/dist/style.css
+theme/nousromancer.yaml
+plugins/nousromancer-mission-control/dashboard/manifest.json
+plugins/nousromancer-mission-control/dashboard/dist/index.js
+plugins/nousromancer-mission-control/dashboard/dist/style.css
 scripts/install.sh
 ```
 
 ## Screenshots
 
-![DTLA Sessions dashboard](screenshots/dtla-dashboard-sessions.png)
+![Nousromancer Sessions dashboard](screenshots/nousromancer-dashboard-sessions.png)
 
-![DTLA Analytics dashboard](screenshots/dtla-dashboard-analytics.png)
+![Nousromancer Analytics dashboard](screenshots/nousromancer-dashboard-analytics.png)
 
 ## License
 

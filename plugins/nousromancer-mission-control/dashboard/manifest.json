@@ -1,0 +1,15 @@
+{
+  "name": "nousromancer-mission-control",
+  "label": "Nousromancer Mission Control",
+  "description": "Slot-only minimal Now Bar and header identity for the Nousromancer Hermes dashboard theme.",
+  "icon": "Sparkles",
+  "version": "1.0.0",
+  "tab": {
+    "path": "/nousromancer-mission-control",
+    "position": "end",
+    "hidden": true
+  },
+  "slots": ["pre-main", "header-left", "header-right"],
+  "entry": "dist/index.js",
+  "css": "dist/style.css"
+}

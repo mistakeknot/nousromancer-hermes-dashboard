@@ -18,8 +18,8 @@ async function exists(file) {
   }
 }
 
-test('install script copies DTLA artifacts into an isolated HERMES_HOME and bounds dashboard rescan', async () => {
-  const work = await mkdtemp(path.join(tmpdir(), 'dtla-install-test-'));
+test('install script copies Nousromancer artifacts into an isolated HERMES_HOME and bounds dashboard rescan', async () => {
+  const work = await mkdtemp(path.join(tmpdir(), 'nousromancer-install-test-'));
   const hermesHome = path.join(work, 'hermes-home');
   const fakeBin = path.join(work, 'bin');
   const curlArgs = path.join(work, 'curl-args.txt');
@@ -42,9 +42,9 @@ test('install script copies DTLA artifacts into an isolated HERMES_HOME and boun
   });
 
   assert.equal(result.status, 0, result.stderr || result.stdout);
-  assert.equal(await exists(path.join(hermesHome, 'dashboard-themes', 'dtla.yaml')), true);
-  assert.equal(await exists(path.join(hermesHome, 'plugins', 'dtla-mission-control', 'dashboard', 'manifest.json')), true);
-  assert.equal(await exists(path.join(hermesHome, 'plugins', 'dtla-mission-control', 'dashboard', 'dist', 'index.js')), true);
+  assert.equal(await exists(path.join(hermesHome, 'dashboard-themes', 'nousromancer.yaml')), true);
+  assert.equal(await exists(path.join(hermesHome, 'plugins', 'nousromancer-mission-control', 'dashboard', 'manifest.json')), true);
+  assert.equal(await exists(path.join(hermesHome, 'plugins', 'nousromancer-mission-control', 'dashboard', 'dist', 'index.js')), true);
 
   const args = await readFile(curlArgs, 'utf8');
   assert.match(args, /--max-time\n[0-9]+/, 'rescan curl must be bounded so install cannot hang on a wedged dashboard');

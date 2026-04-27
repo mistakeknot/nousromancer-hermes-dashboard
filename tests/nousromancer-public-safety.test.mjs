@@ -17,11 +17,11 @@ async function collectFiles(dir, predicate, acc = []) {
   return acc;
 }
 
-test('public DTLA artifacts do not expose sensitive workstream handles', async () => {
+test('public Nousromancer artifacts do not expose sensitive workstream handles', async () => {
   const files = [
     path.join(REPO_ROOT, 'README.md'),
     path.join(REPO_ROOT, 'SUBMISSION.md'),
-    path.join(REPO_ROOT, 'theme', 'dtla.yaml'),
+    path.join(REPO_ROOT, 'theme', 'nousromancer.yaml'),
     ...(await collectFiles(path.join(REPO_ROOT, 'plugins'), (file) => /\.(js|css|json)$/.test(file))),
     ...(await collectFiles(path.join(REPO_ROOT, 'tests'), (file) => file.endsWith('.mjs'))),
   ];

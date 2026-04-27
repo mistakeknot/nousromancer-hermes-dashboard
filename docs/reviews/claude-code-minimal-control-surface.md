@@ -1,10 +1,10 @@
-# Claude Code Review — DTLA Minimal Control Surface
+# Claude Code Review — Nousromancer Minimal Control Surface
 
 Source: Claude Code 2.1.119 print-mode consultation, no tools.
 
 ## Review
 
-# DTLA Design Direction Review
+# Nousromancer Design Direction Review
 
 `★ Insight ─────────────────────────────────────`
 - Hackathon judging usually rewards a *clear demo moment* over breadth — a single "ah" beat (like a persistent Now Bar updating live) outperforms a tour of features.
@@ -28,7 +28,7 @@ The pivot from cockpit to control surface is the right *taste call* but risks un
 
 ## 3. Weak / under-specified / generic
 
-- **"Last trace: Uploading DTLA Skin Theme"** — cute self-reference, but you've never specified *what a trace actually is in Hermes*. Is it the last tool call? Last user prompt? Last skill invocation? The Now Bar's value depends entirely on this and the doc dodges it.
+- **"Last trace: Uploading Nousromancer Skin Theme"** — cute self-reference, but you've never specified *what a trace actually is in Hermes*. Is it the last tool call? Last user prompt? Last skill invocation? The Now Bar's value depends entirely on this and the doc dodges it.
 - **No live behavior specified.** Does the bar poll? Subscribe to SSE? Animate on state change? "Persistent orientation" is meaningless if it's a static render. The *liveness* is what would make a screenshot insufficient and force judges to actually run it — that's what wins.
 - **Three signal colors with no rules.** Pink for "identity AND selected AND primary accent" collides — selected state needs to be distinguishable from brand chrome. The 4%/3%/1% ratio is aspirational, not a system.
 - **Warnings are under-designed.** "Rare enough to matter" — but Hermes users specifically need to know when the gateway dies, a cron fails, a skill errors, keys expire. The warning surface is *the* useful state, and it gets one row in the table.
@@ -36,7 +36,7 @@ The pivot from cockpit to control surface is the right *taste call* but risks un
 - **"Resume" is named but not designed.** What does Resume do? Reopen last session? Replay last prompt? This is potentially the killer feature and it gets a single word.
 - **References list is vibes, not a spec.** "LA at 1:17am after rain" tells the author the mood; it tells judges nothing.
 - **No failure-mode design.** What does the Now Bar look like when the gateway is down AND there's no last trace AND no active sessions? Empty states are where minimal themes die.
-- **"Black glass" is not differentiated.** Every dashboard ships a dark mode. You need to name what makes DTLA's black glass not Vercel's, not Linear's.
+- **"Black glass" is not differentiated.** Every dashboard ships a dark mode. You need to name what makes Nousromancer's black glass not Vercel's, not Linear's.
 
 ## 4. Top changes to improve win odds
 

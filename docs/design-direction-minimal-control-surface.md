@@ -1,4 +1,4 @@
-# DTLA Design Direction — Minimal Control Surface
+# Nousromancer Design Direction — Minimal Control Surface
 
 Status: working design brief for hackathon refinement.
 
@@ -10,11 +10,11 @@ In the context of Hermes Agent, the stronger interpretation is:
 
 > Make Hermes feel like a precise instrument, not a toy cockpit.
 
-DTLA should be minimal, tasteful, and immediately useful.
+Nousromancer should be minimal, tasteful, and immediately useful.
 
 ## Working thesis
 
-> DTLA is a minimal night-mode operations skin for Hermes Agent: a calmer, sharper dashboard that keeps live agent state visible without getting in the way.
+> Nousromancer is a minimal night-mode operations skin for Hermes Agent: a calmer, sharper dashboard that keeps live agent state visible without getting in the way.
 
 Shorter:
 
@@ -45,7 +45,7 @@ Hermes users need fast orientation:
 - Are logs/config/skills one click away?
 - Is there a warning I should act on?
 
-DTLA should add orientation, not lore.
+Nousromancer should add orientation, not lore.
 
 ## Design mantra
 
@@ -114,7 +114,7 @@ Avoid long all-caps explanatory strings in the UI.
 Instead of:
 
 ```text
-DTLA MISSION DECK
+Nousromancer MISSION DECK
 LIVE DASHBOARD SIGNAL FROM HERMES STATUS + RECENT SESSIONS APIS.
 ```
 
@@ -122,7 +122,7 @@ Use something closer to:
 
 ```text
 Now
-Gateway offline · 0 active · Last trace: Uploading DTLA Skin Theme
+Gateway offline · 0 active · Last trace: Uploading Nousromancer Skin Theme
 ```
 
 or:
@@ -141,7 +141,7 @@ The highest-value minimal plugin is a persistent **Now Bar** above every page.
 Example:
 
 ```text
-DTLA   Gateway offline   0 active   Last trace: Uploading DTLA Skin Theme   Logs →
+Nousromancer   Gateway offline   0 active   Last trace: Uploading Nousromancer Skin Theme   Logs →
 ```
 
 This is useful because it gives persistent orientation everywhere.
@@ -171,7 +171,7 @@ The cockpit sidebar should be quieter.
 Target shape:
 
 ```text
-DTLA
+Nousromancer
 ● live/offline
 
 Gateway
@@ -200,7 +200,7 @@ A slot-only plugin is stronger than a novelty tab.
 
 Recommended slots:
 
-- `header-left`: tiny DTLA crest/wordmark.
+- `header-left`: tiny Nousromancer crest/wordmark.
 - `header-right`: one compact status pill.
 - `pre-main`: Now Bar.
 - `sidebar`: quiet cockpit index when cockpit layout is active.
@@ -255,7 +255,7 @@ Sidebar:
 HERMES
 AGENT
 
-DTLA
+Nousromancer
 Sessions
 Analytics
 Logs
@@ -270,7 +270,7 @@ v0.11.0
 Main:
 Sessions
 
-[ DTLA | Gateway offline | 0 active | Last trace: Uploading DTLA Skin Theme | Logs → ]
+[ Nousromancer | Gateway offline | 0 active | Last trace: Uploading Nousromancer Skin Theme | Logs → ]
 
 Recent Sessions
 [clean cards...]
@@ -278,11 +278,11 @@ Recent Sessions
 
 ## Refined pitch
 
-> DTLA is a minimal noir operations skin for Hermes Dashboard. It uses a restrained black-glass palette with pink, blue, and violet signal colors, plus a no-build plugin that adds a persistent Now Bar: gateway state, active sessions, last trace, and quick navigation. It demonstrates dashboard themes and slots without turning the dashboard into a novelty UI.
+> Nousromancer is a minimal noir operations skin for Hermes Dashboard. It uses a restrained black-glass palette with pink, blue, and violet signal colors, plus a no-build plugin that adds a persistent Now Bar: gateway state, active sessions, last trace, and quick navigation. It demonstrates dashboard themes and slots without turning the dashboard into a novelty UI.
 
 ## Evaluation hypothesis
 
-A winning DTLA submission should be judged as:
+A winning Nousromancer submission should be judged as:
 
 - more tasteful than a typical hackathon theme;
 - more useful than a decorative reskin;

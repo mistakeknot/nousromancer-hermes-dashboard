@@ -1,10 +1,10 @@
-# DTLA design philosophy
+# Nousromancer design philosophy
 
 Status: provisional but accepted direction after the first visual critique pass.
 
 ## Core thesis
 
-DTLA should not feel like a generic cyber/HUD skin. It should feel like a serious operator surface shaped by technical clothing, operational indexes, and black-ledger restraint.
+Nousromancer should not feel like a generic cyber/HUD skin. It should feel like a serious operator surface shaped by technical clothing, operational indexes, and black-ledger restraint.
 
 Accepted direction:
 
@@ -48,9 +48,9 @@ This is an **adaptive split**, not a blanket style.
 
 ## Product doctrine
 
-DTLA becomes special when it improves orientation, not when it adds more atmosphere.
+Nousromancer becomes special when it improves orientation, not when it adds more atmosphere.
 
-A good DTLA element answers at least one of:
+A good Nousromancer element answers at least one of:
 
 1. What is Hermes doing now?
 2. Is anything blocked, stale, offline, or risky?

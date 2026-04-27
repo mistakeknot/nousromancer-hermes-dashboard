@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 
-const PLUGIN_PATH = new URL('../plugins/dtla-mission-control/dashboard/dist/index.js', import.meta.url);
+const PLUGIN_PATH = new URL('../plugins/nousromancer-mission-control/dashboard/dist/index.js', import.meta.url);
 const README_PATH = new URL('../README.md', import.meta.url);
 
 function flattenText(node) {
@@ -65,7 +65,7 @@ async function renderRegisteredSlot(slotName, missionData) {
 test('pre-main renders a minimal Now Bar with live Hermes state and trace action', async () => {
   const node = await renderRegisteredSlot('pre-main', {
     status: { gateway_running: true, active_sessions: 1, version: '0.11.0' },
-    sessions: [{ id: 'sess-1', title: 'Build DTLA plugin', is_active: true }],
+    sessions: [{ id: 'sess-1', title: 'Build Nousromancer plugin', is_active: true }],
     error: null,
   });
   const text = flattenText(node).join(' ');
@@ -74,7 +74,7 @@ test('pre-main renders a minimal Now Bar with live Hermes state and trace action
   assert.match(text, /\bNow\b/);
   assert.match(text, /Gateway live/i);
   assert.match(text, /1 active/i);
-  assert.match(text, /Build DTLA plugin/i);
+  assert.match(text, /Build Nousromancer plugin/i);
   assert.match(text, /Trace/i);
   assert.doesNotMatch(text, /mission deck/i);
   assert.doesNotMatch(text, /Live dashboard signal/i);

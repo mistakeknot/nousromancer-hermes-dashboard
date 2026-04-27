@@ -1,4 +1,4 @@
-# DTLA Review Synthesis — Hackathon Winning Direction
+# Nousromancer Review Synthesis — Hackathon Winning Direction
 
 Sources:
 
@@ -20,7 +20,7 @@ The dark theme is necessary for first impression, but the winning “awesome + u
 
 > Hermes users should not hunt across pages to know what their agent is doing.
 
-DTLA should solve that with a small persistent surface showing:
+Nousromancer should solve that with a small persistent surface showing:
 
 - gateway health;
 - active run/session state;
@@ -30,7 +30,7 @@ DTLA should solve that with a small persistent surface showing:
 
 ## What makes it novel for Hermes
 
-A generic dark dashboard status bar is not enough. DTLA becomes Hermes-native when it understands agent-operation pain:
+A generic dark dashboard status bar is not enough. Nousromancer becomes Hermes-native when it understands agent-operation pain:
 
 - session resumption friction;
 - gateway/log/config fragmentation;
@@ -50,10 +50,10 @@ The demo should show one clear live state transition.
 
 Ideal sequence:
 
-1. Dashboard opens in restrained DTLA black-glass theme.
+1. Dashboard opens in restrained Nousromancer black-glass theme.
 2. Now Bar shows healthy state:
    ```text
-   Gateway live · 1 active · Running: Build DTLA plugin · Trace →
+   Gateway live · 1 active · Running: Build Nousromancer plugin · Trace →
    ```
 3. User navigates to another page; Now Bar remains visible.
 4. A failure/degraded mock state appears:
@@ -137,11 +137,11 @@ Acceptance criteria:
 
 Fast version:
 
-> DTLA turns Hermes into a calm ops console: live gateway, active runs, last trace, and logs on every page.
+> Nousromancer turns Hermes into a calm ops console: live gateway, active runs, last trace, and logs on every page.
 
 More explicit version:
 
-> Hermes users should not hunt across pages to know what their agent is doing. DTLA adds a persistent Now Bar that shows gateway health, active runs, latest trace, and the next useful action from every dashboard route.
+> Hermes users should not hunt across pages to know what their agent is doing. Nousromancer adds a persistent Now Bar that shows gateway health, active runs, latest trace, and the next useful action from every dashboard route.
 
 Technical proof line:
 
@@ -149,7 +149,7 @@ Technical proof line:
 
 ## Next build target
 
-Refactor the existing DTLA Mission Deck into a minimal live Now Bar and make the screenshot/demo center that single interaction.
+Refactor the existing Nousromancer Mission Deck into a minimal live Now Bar and make the screenshot/demo center that single interaction.
 
 Priority order:
 

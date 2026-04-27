@@ -55,6 +55,22 @@ This is an **adaptive split**, not a blanket style.
 
 Nousromancer becomes special when it improves orientation, not when it adds more atmosphere.
 
+Primary pain point:
+
+> Hermes operators lose orientation across fragmented agent work. After an interruption or surface shift, they need to know what is alive, what changed, what matters next, and where to resume without hunting across dashboard pages, logs, Discord, CLI sessions, and memory.
+
+Product promise:
+
+> Nousromancer turns the Hermes dashboard into a re-orientation surface: a calm black-ledger console that shows live agent state, recent work, risks, and the next useful action at a glance.
+
+North star:
+
+```text
+orientation → triage → resumption
+```
+
+Persona and pain-point matrix: [`docs/operator-personas-and-pain-points.md`](operator-personas-and-pain-points.md).
+
 A good Nousromancer element answers at least one of:
 
 1. What is Hermes doing now?

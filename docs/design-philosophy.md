@@ -37,11 +37,16 @@ Accepted compression model:
 
 > Readable by default; dense/code-like only for metadata, IDs, status, and machine-state.
 
+Accepted readable-sans personality:
+
+> Hybrid: readable neutral sans for content, product-spec mono for labels, metadata, IDs, status, and machine state.
+
 This is an **adaptive split**, not a blanket style.
 
 - Brand moments may be stylized; functional surfaces must be legible first.
 - Use mono for labels, states, IDs, timestamps, counts, source chips, and metadata.
-- Use readable sans for session titles, descriptions, search, controls, and longer user-facing content.
+- Use readable neutral sans for session titles, descriptions, search, controls, and longer user-facing content.
+- Let the product-spec rhythm come from labels, metadata, row structure, and spacing rather than compressing every text surface.
 - Use uppercase/tracking as a labeling device, not a blanket treatment.
 - Keep session titles and actions readable at screenshot scale.
 - Let contrast, alignment, and spacing carry hierarchy before color or glow.
@@ -79,6 +84,6 @@ or:
 - Future screenshot work should show usefulness before mood.
 - Future visual work should remove duplicate chrome before adding new components.
 
-## Open interview track
+## Next interview track
 
-The next unresolved decision is the primary readable sans personality: what the non-metadata text should feel like when it is not being compressed into technical labels.
+The next unresolved decision is the **density and row-structure mode** for Sessions: how much ledger/index structure should appear in each session row before it starts feeling overdesigned.

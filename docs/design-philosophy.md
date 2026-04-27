@@ -53,31 +53,31 @@ This is an **adaptive split**, not a blanket style.
 
 ## Product doctrine
 
-Nousromancer becomes special when it improves orientation, not when it adds more atmosphere.
+Nousromancer becomes special when it improves the operator's human-in-the-loop decisions, not when it adds more atmosphere.
 
 Primary pain point:
 
-> Hermes operators lose orientation across fragmented agent work. After an interruption or surface shift, they need to know what is alive, what changed, what matters next, and where to resume without hunting across dashboard pages, logs, Discord, CLI sessions, and memory.
+> Hermes operators need to know which agent most needs their input, why that input matters now, and how to think clearly enough to answer the agent well. Re-orientation still matters, but as the substrate: the dashboard should show what is alive, what changed, what is blocked, and what decision the human is being asked to make before the operator has to reconstruct context across dashboard pages, logs, Discord, CLI sessions, and memory.
 
 Product promise:
 
-> Nousromancer turns the Hermes dashboard into a re-orientation surface: a calm black-ledger console that shows live agent state, recent work, risks, and the next useful action at a glance.
+> Nousromancer turns the Hermes dashboard into an agent-input triage surface: a calm black-ledger console that ranks human-needed decisions, exposes the reasoning context, and helps the operator respond precisely.
 
 North star:
 
 ```text
-orientation → triage → resumption
+which agent → why now → how to answer
 ```
 
 Persona and pain-point matrix: [`docs/operator-personas-and-pain-points.md`](operator-personas-and-pain-points.md).
 
 A good Nousromancer element answers at least one of:
 
-1. What is Hermes doing now?
-2. Is anything blocked, stale, offline, or risky?
-3. What session/context should I resume?
-4. What is the next useful action?
-5. What changed since I last looked?
+1. Which agent/session is waiting on me?
+2. How important or urgent is that input relative to the rest?
+3. What decision am I actually being asked to make?
+4. What context or evidence do I need before answering?
+5. What would a good answer unlock, prevent, or clarify?
 
 ## Visual metaphor
 
@@ -95,11 +95,11 @@ or:
 
 ## Implementation implications
 
-- The Now Bar remains the useful persistent surface.
-- The Sessions page should be the first proof of taste: readable rows, quiet source metadata, clear search, hidden destructive actions, and live state without noise.
-- Future screenshot work should show usefulness before mood.
+- The Now Bar should graduate from generic status into the persistent human-input queue: top waiting agent, urgency/stakes, and the next response target when available.
+- The Sessions page should be the first proof of taste: readable rows, quiet source metadata, clear search, hidden destructive actions, and enough decision context to choose answer now, ask a follow-up, defer, or clean up.
+- Future screenshot work should show human-in-the-loop usefulness before mood.
 - Future visual work should remove duplicate chrome before adding new components.
 
 ## Next interview track
 
-The next unresolved decision is the **density and row-structure mode** for Sessions: how much ledger/index structure should appear in each session row before it starts feeling overdesigned.
+The next unresolved decision is the **density and row-structure mode** for Sessions: how much ledger/index structure should appear in each session row before it stops helping the operator decide which agent needs input and how to answer.

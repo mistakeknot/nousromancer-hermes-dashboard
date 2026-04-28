@@ -5,7 +5,7 @@ Nousromancer is a minimal noir operations skin for Hermes Agent: a black technic
 - Theme: `theme/nousromancer.yaml`
 - Plugin: `plugins/nousromancer-mission-control/`
 
-The theme keeps the dashboard in the standard layout to avoid sidebar collisions with other installed plugins. The companion plugin adds a persistent Now Bar above every page: gateway health, active runs, latest trace, data freshness, and the next useful action in one restrained strip. It distinguishes live gateway, stale refresh, and API-error states in text instead of color alone. It also adds a small header crest and night-ops status pill.
+The theme keeps the dashboard in the standard layout to avoid sidebar collisions with other installed plugins. The companion plugin adds a persistent Now Bar above every page: gateway health, active runs, latest trace, data freshness, conservative `Possibly waiting` hints, and the next useful action in one restrained strip. It distinguishes live gateway, stale refresh, API-error states, assistant-question hints, and session error/stall evidence in text instead of color alone. It also adds a small header crest and night-ops status pill.
 
 ## Install
 
@@ -39,8 +39,9 @@ Refresh `hermes dashboard`, select `Nousromancer`, and the Now Bar appears above
 - A full dashboard theme using palette, typography, standard layout, restrained component chrome, color overrides, and custom CSS.
 - A no-build dashboard plugin using `window.__HERMES_PLUGIN_SDK__`.
 - Slot injection into `pre-main`, `header-left`, and `header-right`.
-- A persistent Now Bar that keeps gateway health, active runs, latest trace, data freshness, API-error state, and the next useful action visible across routes.
+- A persistent Now Bar that keeps gateway health, active runs, latest trace, data freshness, API-error state, conservative `Possibly waiting` hints, and the next useful action visible across routes.
 - Session-list polish that clarifies search copy, marks source chips as metadata, and demotes delete controls until intent.
+- Conservative attention-hint infrastructure for assistant question-like turns and session error/stall evidence, with no authoritative `needs input`/`blocked on you`/`highest priority` claim.
 - Live data from `SDK.api.getStatus()` and `SDK.api.getSessions()`.
 - Theme/plugin composition without forking Hermes or running an npm build.
 ## Files

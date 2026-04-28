@@ -102,7 +102,14 @@ Rules:
 2. Derive `Latest: src:<source>` from the first returned session when present.
 3. Link to `/sessions` when the dashboard API is healthy; link to `/logs` on API/runtime errors.
 4. Do not label anything `needs input`, `blocked on you`, or `highest priority` until Hermes exposes an explicit signal.
-5. If the heuristic is used, label it `Possibly waiting`, source it from a bounded low-cost message-role check, and make the uncertainty visible in copy/tests.
+5. If the heuristic is used, label it `Possibly waiting`, source it from bounded evidence, and make the uncertainty visible in copy/tests.
+
+Current infrastructure:
+
+- **Message-role hint:** show `Possibly waiting` when the latest meaningful session turn is assistant/agent-originated and question-like.
+- **Error/stall hint:** show `Possibly waiting` when session state/error fields indicate `stalled`, `failed`, `blocked`, degraded state, failed tools, or similar interruption evidence.
+- **Future upstream hook:** consume explicit `attention_state`, `waiting_on_human`, `requires_action`, blocked reason, response target, and urgency/stakes when Hermes exposes them, while preserving the public copy boundary.
+- **Fallback:** show no attention hint when evidence is insufficient.
 
 ## Follow-up implementation candidates
 
@@ -114,9 +121,9 @@ Rules:
    - Propose or implement a Hermes `attention_state` / `waiting_on_human` field in the session list API.
    - Tests: list endpoint includes conservative default; UI can rank without fetching every message.
 
-3. **Message-role heuristic experiment**
-   - Only if upstream signal is unavailable.
-   - Fetch latest messages lazily or from a bounded endpoint and classify `last_role === assistant` as “possibly waiting,” with cautious copy.
+3. **Sessions row attention context**
+   - Carry the tested `Possibly waiting` evidence into Sessions row metadata.
+   - Show the evidence source quietly (`assistant question-like turn`, `session stalled`, `failed tool`) without converting it into authoritative priority.
    - Must avoid noisy false certainty.
 
 ## Decision

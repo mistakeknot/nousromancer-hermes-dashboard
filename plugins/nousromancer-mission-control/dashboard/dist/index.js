@@ -137,6 +137,108 @@
     };
   }
 
+  const ASSISTANT_ROLES = ["assistant", "agent", "ai", "model"];
+  const ERROR_OR_STALL_STATES = ["blocked", "degraded", "error", "failed", "failure", "interrupted", "stale", "stalled", "waiting"];
+
+  function compactText(value) {
+    if (value == null) return "";
+    if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return String(value).trim();
+    if (Array.isArray(value)) {
+      return value.map(function (item) { return compactText(item); }).filter(Boolean).join(" ").trim();
+    }
+    if (typeof value === "object") {
+      return compactText(value.text || value.content || value.message || value.value || value.role || value.name || value.title || value.preview || "");
+    }
+    return "";
+  }
+
+  function firstTextField(object, fields) {
+    if (!object) return "";
+    for (let i = 0; i < fields.length; i += 1) {
+      const text = compactText(object[fields[i]]);
+      if (text) return text;
+    }
+    return "";
+  }
+
+  function roleName(message) {
+    if (!message) return "";
+    if (typeof message === "string") return "";
+    return firstTextField(message, ["role", "sender", "author", "speaker", "type"]).toLowerCase();
+  }
+
+  function messageText(message) {
+    if (!message) return "";
+    if (typeof message === "string") return message.trim();
+    return firstTextField(message, ["content", "text", "message", "body", "summary", "preview", "title"]);
+  }
+
+  function latestMeaningfulMessage(session) {
+    if (!session) return null;
+    const messageFields = ["messages", "recent_messages", "recentMessages", "turns", "conversation", "events"];
+    for (let i = 0; i < messageFields.length; i += 1) {
+      const value = session[messageFields[i]];
+      if (!Array.isArray(value)) continue;
+      for (let j = value.length - 1; j >= 0; j -= 1) {
+        const candidate = value[j];
+        if (messageText(candidate) || roleName(candidate)) return candidate;
+      }
+    }
+    const fallbackRole = firstTextField(session, ["last_message_role", "lastMessageRole", "latest_role", "latestRole", "last_role"]);
+    const fallbackText = firstTextField(session, ["last_message", "lastMessage", "latest_message", "latestMessage", "latest_text", "latestText", "preview"]);
+    if (fallbackRole || fallbackText) return { role: fallbackRole, content: fallbackText };
+    return null;
+  }
+
+  function looksQuestionLike(text) {
+    const normalized = String(text || "").toLowerCase();
+    if (!normalized) return false;
+    return /\?/.test(normalized) || /\b(should i|should we|shall i|shall we|do you want|would you like|want me to|can i|may i|which|choose|pick|approve|confirm|decision|decide|waiting for approval)\b/.test(normalized);
+  }
+
+  function sessionErrorOrStallEvidence(session) {
+    if (!session) return null;
+    if (session.waiting_on_human === true || session.waitingOnHuman === true || session.requires_action === true || session.requiresAction === true) {
+      return "explicit attention field present";
+    }
+    const attentionState = firstTextField(session, ["attention_state", "attentionState"]);
+    if (/waiting|blocked|requires|attention/.test(attentionState.toLowerCase())) return "attention state: " + attentionState;
+    const stateText = firstTextField(session, ["status", "state", "phase", "lifecycle"]);
+    const normalizedState = stateText.toLowerCase();
+    if (ERROR_OR_STALL_STATES.some(function (state) { return normalizedState.indexOf(state) >= 0; })) return "session state: " + stateText;
+    const errorText = firstTextField(session, ["error", "last_error", "lastError", "error_message", "errorMessage", "failure", "failureReason", "blocked_reason", "blockedReason"]);
+    if (errorText) return "session error/stall evidence";
+    if (Array.isArray(session.failed_tools) && session.failed_tools.length) return "failed tool evidence";
+    if (Array.isArray(session.failedTools) && session.failedTools.length) return "failed tool evidence";
+    return null;
+  }
+
+  function sessionMessageAttentionEvidence(session) {
+    const latest = latestMeaningfulMessage(session);
+    if (!latest) return null;
+    const role = roleName(latest);
+    const text = messageText(latest);
+    const assistantLike = ASSISTANT_ROLES.indexOf(role) >= 0;
+    if (assistantLike && looksQuestionLike(text)) return "assistant question-like turn";
+    return null;
+  }
+
+  function possibleAttentionHint(sessions) {
+    const list = Array.isArray(sessions) ? sessions : [];
+    for (let i = 0; i < list.length; i += 1) {
+      const evidence = sessionErrorOrStallEvidence(list[i]) || sessionMessageAttentionEvidence(list[i]);
+      if (evidence) {
+        const title = recentTitle(list[i]);
+        return {
+          label: "Possibly waiting",
+          tone: "attention",
+          title: "Hedged attention hint: " + evidence + " in " + title + ". Not an authoritative priority signal.",
+        };
+      }
+    }
+    return null;
+  }
+
   const SESSION_SOURCES = ["cli", "telegram", "discord", "slack", "whatsapp", "cron", "local"];
 
   function sessionSource(text) {
@@ -193,7 +295,10 @@
   function NowItem(props) {
     return h(
       "span",
-      { className: props.tone ? "nousromancer-now-item nousromancer-now-item--" + props.tone : "nousromancer-now-item" },
+      {
+        className: props.tone ? "nousromancer-now-item nousromancer-now-item--" + props.tone : "nousromancer-now-item",
+        title: props.title,
+      },
       props.children,
     );
   }
@@ -218,6 +323,7 @@
     const apiError = data.error ? errorMessage(data.error) : "";
     const hasApiError = Boolean(apiError);
     const freshness = freshnessState(data.refreshedAt, data.nowMs);
+    const attentionHint = possibleAttentionHint(sessions);
     const actionHref = gatewayLive && !hasApiError ? "/sessions" : "/logs";
     const actionLabel = gatewayLive && !hasApiError ? "Trace" : "Open logs";
     const actionTitle = hasApiError
@@ -234,6 +340,7 @@
       h(NowItem, { tone: gatewayLive && !hasApiError ? "live" : "warn" }, gatewayLabel),
       h(NowItem, { tone: count ? "active" : "muted" }, count + " active"),
       h(NowItem, { tone: freshness.tone }, freshness.label),
+      attentionHint ? h(NowItem, { tone: attentionHint.tone, title: attentionHint.title }, attentionHint.label) : null,
       h("span", { className: "nousromancer-now-trace", title: latestTitle }, "Last trace: ", latestTitle),
       h(NowAction, { href: actionHref, title: actionTitle }, actionLabel, " →"),
     );

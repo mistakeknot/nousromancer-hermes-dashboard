@@ -28,7 +28,7 @@
   align-items: center;
   display: grid;
   gap: 0.62rem;
-  grid-template-columns: auto auto auto auto minmax(8rem, 1fr) auto;
+  grid-template-columns: auto auto auto auto auto minmax(8rem, 1fr) auto;
   padding: 0.54rem 0.72rem;
 }
 
@@ -60,7 +60,8 @@
   color: #8ea0a8;
 }
 
-.nousromancer-now-item--warn {
+.nousromancer-now-item--warn,
+.nousromancer-now-item--attention {
   border-color: rgba(199, 128, 141, 0.42);
   color: #c7808d;
 }

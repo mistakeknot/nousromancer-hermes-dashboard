@@ -130,6 +130,64 @@ test('pre-main Now Bar exposes last successful refresh freshness and stale state
   assert.match(text, /No recent trace/i);
 });
 
+test('pre-main Now Bar shows a hedged Possibly waiting hint for assistant question turns', async () => {
+  const node = await renderRegisteredSlot('pre-main', {
+    status: { gateway_running: true, active_sessions: 1, version: '0.11.0' },
+    sessions: [{
+      id: 'sess-question',
+      title: 'Review release decision',
+      is_active: true,
+      messages: [
+        { role: 'user', content: 'Check whether the branch is ready.' },
+        { role: 'assistant', content: 'Should I merge this now, or wait for another pass?' },
+      ],
+    }],
+    error: null,
+  });
+  const text = flattenText(node).join(' ');
+
+  assert.match(text, /Possibly waiting/i);
+  assert.doesNotMatch(text, /needs input|blocked on you|highest priority/i);
+});
+
+test('pre-main Now Bar shows a hedged Possibly waiting hint for session error or stall evidence', async () => {
+  const node = await renderRegisteredSlot('pre-main', {
+    status: { gateway_running: true, active_sessions: 1, version: '0.11.0' },
+    sessions: [{
+      id: 'sess-stalled',
+      title: 'Deploy handoff',
+      is_active: true,
+      status: 'stalled',
+      error: 'tool call failed while waiting for approval',
+    }],
+    error: null,
+  });
+  const text = flattenText(node).join(' ');
+
+  assert.match(text, /Possibly waiting/i);
+  assert.doesNotMatch(text, /needs input|blocked on you|highest priority/i);
+});
+
+test('pre-main Now Bar omits possible-attention hints when evidence is insufficient', async () => {
+  const node = await renderRegisteredSlot('pre-main', {
+    status: { gateway_running: true, active_sessions: 1, version: '0.11.0' },
+    sessions: [{
+      id: 'sess-working',
+      title: 'Background cleanup',
+      is_active: true,
+      messages: [
+        { role: 'user', content: 'Clean up the screenshots.' },
+        { role: 'assistant', content: 'I am checking the screenshot artifacts now.' },
+      ],
+    }],
+    error: null,
+  });
+  const text = flattenText(node).join(' ');
+
+  assert.doesNotMatch(text, /Possibly waiting/i);
+  assert.doesNotMatch(text, /needs input|blocked on you|highest priority/i);
+});
+
 test('README explains the Now Bar usefulness in judge-scannable language', async () => {
   const source = await readFile(README_PATH, 'utf8');
 

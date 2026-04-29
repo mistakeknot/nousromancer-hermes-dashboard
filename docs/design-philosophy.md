@@ -98,13 +98,35 @@ or:
 
 > a black ledger for live agent state
 
+## Accepted Sessions row structure
+
+Decision bead: `nousrmncr-lr8.3`.
+
+Accepted mode:
+
+> **Input-priority hybrid rows** — readable decision content first, quiet technical metadata second.
+
+This chooses the product-correct middle path between minimal product rows and dense ledger rows:
+
+1. **Primary readable content:** session title, best-known ask, or decision summary in neutral sans.
+2. **Hedged attention/status signal:** `Possibly waiting` only when a tested heuristic or upstream attention field supports it; otherwise use truthful state such as active, stale, degraded, failed, or recently changed.
+3. **Quiet mono metadata:** source, recency, model/tool/session state, freshness, and any known stakes or evidence labels.
+4. **One next-response state:** answer now, ask follow-up, defer, investigate, or clean up.
+
+The row should look like an agent-operations index, but only where the index structure improves attention arbitration or answer quality. Product-spec rhythm belongs in metadata and labels, not in compressed functional content.
+
+Boundary:
+
+- Do **not** claim authoritative `needs input`, `blocked on you`, `highest priority`, or ranked human-needed decisions until Hermes exposes explicit attention-state fields.
+- Treat adaptive attention rows as the later evolution once upstream `attention_state`, response target, blocked reason, urgency, and stakes are available.
+
 ## Implementation implications
 
 - The Now Bar should first prove truthful health/freshness/source orientation, then add a hedged `Possibly waiting` attention hint only where a tested heuristic or upstream signal supports it.
-- The Sessions page should be the first proof of taste: readable rows, quiet source metadata, clear search, hidden destructive actions, and enough decision context to choose answer now, ask a follow-up, defer, or clean up without pretending to know priority more precisely than the data allows.
+- The Sessions page should be the first proof of taste: input-priority hybrid rows, quiet source metadata, clear search, hidden destructive actions, and enough decision context to choose answer now, ask a follow-up, defer, investigate, or clean up without pretending to know priority more precisely than the data allows.
 - Future screenshot work should show human-in-the-loop usefulness before mood.
 - Future visual work should remove duplicate chrome before adding new components.
 
-## Next interview track
+## Future interview track
 
-The next unresolved decision is the **density and row-structure mode** for Sessions: how much ledger/index structure should appear in each session row before it stops helping the operator decide which agent needs input and how to answer.
+The next design question is not whether Sessions rows should be minimal or ledger-dense; that is settled. The next unresolved question is how far to push **adaptive attention rows** once Hermes exposes stronger upstream attention fields.

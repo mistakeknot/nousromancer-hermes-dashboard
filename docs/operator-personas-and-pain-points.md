@@ -38,6 +38,19 @@ which agent → why now → how to answer
 6. **Make status actionable and non-color-only.** Health, stale, blocked, degraded, and offline states need text labels and a clear next action.
 7. **Keep the public artifact safe and legible.** Public screenshots and repo copy should prove Hermes-native usefulness without leaking private ops-plane context.
 
+## Accepted Sessions row mode
+
+Decision bead: `nousrmncr-lr8.3` closed the row-density question as **C — input-priority hybrid rows**.
+
+Practical row hierarchy:
+
+1. readable session title / best-known ask / decision summary;
+2. hedged attention or status signal, especially `Possibly waiting` when supported by tested evidence;
+3. quiet mono source, recency, freshness, model/tool/session metadata, and stakes/evidence labels;
+4. one obvious next-response state: answer now, ask follow-up, defer, investigate, or clean up.
+
+This keeps rows public-legible while making them operationally useful. Dense ledger/spec treatment is allowed only where it helps triage or response quality. Adaptive attention rows become the future direction once Hermes exposes stronger upstream attention-state data.
+
 ## Implications for the next styling pass
 
 - The Now Bar is the primary proof of staged attention: health, freshness, latest source, and possibly-waiting hints before any authoritative priority claim.

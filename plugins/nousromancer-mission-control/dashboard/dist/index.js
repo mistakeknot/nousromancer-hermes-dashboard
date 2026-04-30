@@ -142,7 +142,8 @@
   const DISCORD_URL_RE = /https?:\/\/(?:canary\.|ptb\.)?discord(?:app)?\.com\/\S+/i;
   const SNOWFLAKE_RE = /\b\d{17,20}\b/;
   const TOKENISH_RE = /\b(?:github_pat_|ghp_|sk-[A-Za-z0-9_-]{8,}|token|secret|password|webhook)\b/i;
-  const FORBIDDEN_ATTENTION_COPY_RE = /\b(?:needs input|blocked on you|highest priority)\b/i;
+  // Suppress authoritative attention/priority variants before they can appear in row metadata or tooltips.
+  const FORBIDDEN_ATTENTION_COPY_RE = /\b(?:(?:needs?|requires?|awaiting|waiting(?:[\s-]+for)?)(?:[\s-]+\w+){0,4}[\s-]+(?:input|response|reply|action|attention)|blocked[\s-]+on[\s-]+(?:you|the[\s-]+user|user|@[A-Za-z0-9_-]+)|(?:highest|top|critical|urgent)[\s-]+priority|priority\s*#?\s*[01]|p[01]|top[\s-]+of[\s-]+the[\s-]+queue|most[\s-]+important)\b/i;
 
   function compactText(value) {
     if (value == null) return "";
@@ -370,36 +371,33 @@
     }
   }
 
-  function escapeAttribute(value) {
-    return String(value || "").replace(/\\/g, "\\\\").replace(/"/g, "\\\"");
+  function datasetValue(row, key) {
+    if (!row || !row.dataset) return "";
+    return String(row.dataset[key] || "").trim();
   }
 
-  function rowTextMatches(row, text) {
-    if (!row || !text) return false;
-    return String(row.textContent || "").toLowerCase().indexOf(String(text).toLowerCase()) >= 0;
+  function rowAttributeValue(row, attributeName, datasetKey) {
+    if (!row) return "";
+    if (row.getAttribute) {
+      const value = row.getAttribute(attributeName);
+      if (value) return String(value).trim();
+    }
+    return datasetValue(row, datasetKey);
+  }
+
+  function rowSessionId(row) {
+    return rowAttributeValue(row, "data-session-id", "sessionId") ||
+      rowAttributeValue(row, "data-session", "session");
   }
 
   function findSessionRow(session) {
     if (typeof document === "undefined" || !session) return null;
     const id = safeDisplayText(firstTextField(session, ["id", "session_id", "sessionId"]), "");
-    if (id) {
-      const escapedId = escapeAttribute(id);
-      const idSelectors = [
-        'main [data-session-id="' + escapedId + '"]',
-        'main [data-session="' + escapedId + '"]',
-        'main [data-id="' + escapedId + '"]',
-      ];
-      for (let i = 0; i < idSelectors.length; i += 1) {
-        const exact = queryOne(idSelectors[i]);
-        if (exact) return exact;
-      }
-    }
+    if (!id) return null;
 
-    const title = safeDisplayText(recentTitle(session), "");
-    if (!title) return null;
-    const candidates = queryAll('main [data-session-id], main [data-session], main [role="row"], main article, main li, main tr, main .cursor-pointer');
+    const candidates = queryAll('main [data-session-id], main [data-session]');
     for (let i = 0; i < candidates.length; i += 1) {
-      if (rowTextMatches(candidates[i], title)) return candidates[i];
+      if (rowSessionId(candidates[i]) === id) return candidates[i];
     }
     return null;
   }
@@ -439,28 +437,50 @@
   }
 
   function upsertRowAttentionContext(row, context) {
-    if (!row || !row.querySelector) return;
+    if (!row || !row.querySelector) return null;
     const existing = row.querySelector('[data-nousromancer-attention-context="true"]');
     if (!context) {
       if (existing && existing.remove) existing.remove();
-      return;
+      return null;
     }
-    if (typeof document === "undefined" || !document.createElement || !row.appendChild) return;
+    if (typeof document === "undefined" || !document.createElement || !row.appendChild) return null;
+
+    const ariaLabel = "Hermes attention context: " + context.label;
+    if (existing &&
+        existing.textContent === context.text &&
+        existing.getAttribute &&
+        existing.getAttribute("aria-label") === ariaLabel &&
+        existing.getAttribute("title") === context.title) {
+      return existing;
+    }
+
     const chip = existing || document.createElement("span");
     chip.dataset.nousromancerAttentionContext = "true";
     chip.className = "nousromancer-row-attention-context";
-    chip.textContent = context.text;
-    chip.setAttribute("aria-label", "Hermes attention context: " + context.label);
-    chip.setAttribute("title", context.title);
+    if (chip.textContent !== context.text) chip.textContent = context.text;
+    if (!chip.getAttribute || chip.getAttribute("aria-label") !== ariaLabel) chip.setAttribute("aria-label", ariaLabel);
+    if (!chip.getAttribute || chip.getAttribute("title") !== context.title) chip.setAttribute("title", context.title);
     if (!existing) row.appendChild(chip);
+    return chip;
   }
 
   function polishSessionAttentionRows(sessions) {
     const list = Array.isArray(sessions) ? sessions : [];
+    const activeRows = typeof Set !== "undefined" ? new Set() : null;
+
     for (let i = 0; i < list.length; i += 1) {
       const row = findSessionRow(list[i]);
       if (!row) continue;
-      upsertRowAttentionContext(row, rowAttentionContext(list[i]));
+      const context = rowAttentionContext(list[i]);
+      if (context && activeRows) activeRows.add(row);
+      upsertRowAttentionContext(row, context);
+    }
+
+    if (activeRows) {
+      const chips = queryAll('main [data-nousromancer-attention-context="true"]');
+      chips.forEach(function (chip) {
+        if (chip && chip.parentElement && !activeRows.has(chip.parentElement) && chip.remove) chip.remove();
+      });
     }
   }
 

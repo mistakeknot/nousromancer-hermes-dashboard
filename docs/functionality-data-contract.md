@@ -127,7 +127,7 @@ Rules:
 Current infrastructure:
 
 - **Now Bar contract signal:** explicit upstream fields render a bounded `Attention: …` / `Possibly waiting` pill and safe dashboard-local CTA when present.
-- **Sessions row context:** matching Sessions rows get quiet `attn:<state>` and `src:<source>` metadata only from explicit non-unknown upstream attention fields; reason/evidence stay in sanitized tooltips.
+- **Sessions row context:** matching Sessions rows with stable row ID hooks get quiet `attn:<state>` and `src:<source>` metadata only from explicit non-unknown upstream attention fields; reason/evidence stay in sanitized tooltips. If row identity is unavailable, the plugin suppresses row metadata instead of matching by title text. Stable row hooks currently mean `data-session-id` or `data-session`; generic `data-id` is intentionally ignored.
 - **Message-role hint:** show `Possibly waiting` when the latest meaningful session turn is assistant/agent-originated and question-like.
 - **Error/stall hint:** show `Possibly waiting` when session state/error fields indicate `stalled`, `failed`, `blocked`, degraded state, failed tools, or similar interruption evidence.
 - **Explicit upstream hook:** consume `attention_state`, `attention_reason`, `response_target`, and `attention_evidence` when Hermes exposes them. Explicit evidence outranks local heuristics, but public copy remains bounded to evidence-backed attention state, not global priority.
@@ -144,8 +144,8 @@ Current infrastructure:
    - Tests cover explicit attention rendering, safe response-target routing, unknown suppression, unsafe field redaction, heuristic fallback, and legacy sessions.
 
 3. **Sessions row attention context**
-   - Implemented for explicit upstream contract evidence: matching rows receive quiet `attn:<state>` / `src:<source>` metadata and sanitized tooltips.
-   - Unknown or unsafe evidence stays silent, and heuristics remain Now Bar fallback-only rather than row-level certainty.
+   - Implemented for explicit upstream contract evidence: matching rows with stable row ID hooks receive quiet `attn:<state>` / `src:<source>` metadata and sanitized tooltips.
+   - Unknown, unsafe, or unidentifiable row evidence stays silent, and heuristics remain Now Bar fallback-only rather than row-level certainty.
 
 ## Decision
 

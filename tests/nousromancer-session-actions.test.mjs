@@ -15,7 +15,9 @@ function makeElement({ textContent = '', placeholder = '', attributes = {} } = {
     children: [],
     parentElement: null,
     className: '',
+    attributeWriteCount: 0,
     setAttribute(name, value) {
+      this.attributeWriteCount += 1;
       this.attributes[name] = String(value);
     },
     getAttribute(name) {
@@ -165,7 +167,7 @@ test('Nousromancer adds evidence-backed attention context to matching Sessions r
     },
   };
 
-  await runPreMainEffectsWithDocument(fakeDocument, {
+  const { observers } = await runPreMainEffectsWithDocument(fakeDocument, {
     status: { gateway_running: true, active_sessions: 1 },
     sessions: [{
       id: 'sess-attention',
@@ -192,6 +194,11 @@ test('Nousromancer adds evidence-backed attention context to matching Sessions r
   assert.match(chip.getAttribute('title'), /approval requested for release merge/i);
   assert.doesNotMatch(`${chip.textContent} ${chip.getAttribute('title')}`, /needs input|blocked on you|highest priority/i);
   assert.equal(created.length, 1, 'one chip is created for the explicit attention row');
+  const writesAfterFirstPass = chip.attributeWriteCount;
+  observers[0].callback();
+  assert.equal(created.length, 1, 'observer re-polish does not create duplicate attention chips');
+  assert.equal(row.children.filter((child) => child.dataset.nousromancerAttentionContext === 'true').length, 1);
+  assert.equal(chip.attributeWriteCount, writesAfterFirstPass, 'observer re-polish does not rewrite unchanged chip attributes');
 });
 
 test('Nousromancer redacts authoritative attention phrases from Sessions-row attention tooltips', async () => {
@@ -222,9 +229,9 @@ test('Nousromancer redacts authoritative attention phrases from Sessions-row att
       is_active: true,
       source: 'cli',
       attention_state: 'waiting_on_human',
-      attention_reason: 'needs input because the release is blocked on you',
+      attention_reason: 'awaiting your input because this is P0 and blocked-on-you',
       attention_evidence: [
-        { type: 'assistant_prompt', source: 'session', summary: 'highest priority approval requested' },
+        { type: 'assistant_prompt', source: 'session', summary: 'top of the queue and most important approval requested' },
       ],
     }],
     error: null,
@@ -233,7 +240,139 @@ test('Nousromancer redacts authoritative attention phrases from Sessions-row att
   const chip = row.children.find((child) => child.dataset.nousromancerAttentionContext === 'true');
   assert.ok(chip, 'bounded attention context still renders after unsafe detail redaction');
   assert.match(chip.textContent, /attn:requested|attn:attention/i);
-  assert.doesNotMatch(`${chip.textContent} ${chip.getAttribute('title')}`, /needs input|blocked on you|highest priority/i);
+  assert.doesNotMatch(`${chip.textContent} ${chip.getAttribute('title')}`, /needs input|needs your input|awaiting your input|blocked on you|blocked-on-you|highest priority|top priority|top of the queue|most important|\bP0\b/i);
+});
+
+test('Nousromancer redacts unsafe private handles from non-unknown Sessions-row attention tooltips', async () => {
+  const snowflake = ['1498420617', '710407823'].join('');
+  const tokenish = ['github_pat_', 'unsafeTOKEN123456789'].join('');
+  const row = makeElement({ textContent: 'Unsafe detail handoff' });
+  row.dataset.sessionId = 'sess-unsafe-detail';
+  const fakeDocument = {
+    body: makeElement(),
+    createElement(tagName) {
+      const element = makeElement();
+      element.tagName = String(tagName).toUpperCase();
+      return element;
+    },
+    querySelector() {
+      return null;
+    },
+    querySelectorAll(selector) {
+      if (selector === 'main button[aria-label="Delete session"]') return [];
+      if (/data-session-id|data-session|role="row"|cursor-pointer|article|li|tr/.test(selector)) return [row];
+      return [];
+    },
+  };
+
+  await runPreMainEffectsWithDocument(fakeDocument, {
+    status: { gateway_running: true, active_sessions: 1 },
+    sessions: [{
+      id: 'sess-unsafe-detail',
+      title: 'Unsafe detail handoff',
+      is_active: true,
+      source: 'discord',
+      attention_state: 'waiting_on_human',
+      attention_reason: `approval requested in https://discord.com/channels/${snowflake}/${snowflake}`,
+      attention_evidence: [
+        { type: 'assistant_prompt', source: 'session', summary: `private token ${tokenish}` },
+      ],
+    }],
+    error: null,
+  });
+
+  const chip = row.children.find((child) => child.dataset.nousromancerAttentionContext === 'true');
+  assert.ok(chip, 'bounded attention context still renders after private detail redaction');
+  assert.match(chip.textContent, /attn:requested/i);
+  const rendered = `${chip.textContent} ${chip.getAttribute('title')}`;
+  assert.doesNotMatch(rendered, new RegExp(`${snowflake}|discord\\.com/channels|github_pat_unsafeTOKEN`));
+  assert.doesNotMatch(rendered, /needs input|blocked on you|highest priority/i);
+});
+
+test('Nousromancer does not attach attention context by title-only or generic data-id matching when stable row IDs are absent', async () => {
+  const row = makeElement({ textContent: 'Release decision', attributes: { 'data-id': 'sess-id-not-on-row' } });
+  const fakeDocument = {
+    body: makeElement(),
+    createElement(tagName) {
+      const element = makeElement();
+      element.tagName = String(tagName).toUpperCase();
+      return element;
+    },
+    querySelector() {
+      return null;
+    },
+    querySelectorAll(selector) {
+      if (selector === 'main button[aria-label="Delete session"]') return [];
+      if (/data-session-id|data-session|data-id|role="row"|cursor-pointer|article|li|tr/.test(selector)) return [row];
+      return [];
+    },
+  };
+
+  await runPreMainEffectsWithDocument(fakeDocument, {
+    status: { gateway_running: true, active_sessions: 1 },
+    sessions: [{
+      id: 'sess-id-not-on-row',
+      title: 'Release decision',
+      is_active: true,
+      source: 'discord',
+      attention_state: 'waiting_on_human',
+      attention_reason: 'approval requested',
+    }],
+    error: null,
+  });
+
+  assert.equal(row.children.filter((child) => child.dataset.nousromancerAttentionContext === 'true').length, 0);
+});
+
+test('Nousromancer removes stale Sessions-row attention context when explicit state becomes unknown', async () => {
+  const row = makeElement({ textContent: 'State changed handoff' });
+  row.dataset.sessionId = 'sess-state-change';
+  const fakeDocument = {
+    body: makeElement(),
+    createElement(tagName) {
+      const element = makeElement();
+      element.tagName = String(tagName).toUpperCase();
+      return element;
+    },
+    querySelector() {
+      return null;
+    },
+    querySelectorAll(selector) {
+      if (selector === 'main button[aria-label="Delete session"]') return [];
+      if (/data-session-id|data-session/.test(selector)) return [row];
+      if (/data-nousromancer-attention-context/.test(selector)) {
+        return row.children.filter((child) => child.dataset.nousromancerAttentionContext === 'true');
+      }
+      return [];
+    },
+  };
+
+  await runPreMainEffectsWithDocument(fakeDocument, {
+    status: { gateway_running: true, active_sessions: 1 },
+    sessions: [{
+      id: 'sess-state-change',
+      title: 'State changed handoff',
+      is_active: true,
+      source: 'discord',
+      attention_state: 'waiting_on_human',
+      attention_reason: 'approval requested',
+    }],
+    error: null,
+  });
+  assert.equal(row.children.filter((child) => child.dataset.nousromancerAttentionContext === 'true').length, 1);
+
+  await runPreMainEffectsWithDocument(fakeDocument, {
+    status: { gateway_running: true, active_sessions: 1 },
+    sessions: [{
+      id: 'sess-state-change',
+      title: 'State changed handoff',
+      is_active: true,
+      source: 'discord',
+      attention_state: 'unknown',
+    }],
+    error: null,
+  });
+  assert.equal(row.children.filter((child) => child.dataset.nousromancerAttentionContext === 'true').length, 0);
 });
 
 test('Nousromancer suppresses Sessions-row attention context for unknown state and unsafe private handles', async () => {

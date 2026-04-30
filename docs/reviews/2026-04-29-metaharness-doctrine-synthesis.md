@@ -14,13 +14,16 @@ Reviewed inputs:
 
 Reviewer artifacts:
 
-- Oracle: `docs/reviews/2026-04-29-metaharness-doctrine-oracle.md`
+- Oracle API fallback: `docs/reviews/2026-04-29-metaharness-doctrine-oracle.md`
+- Oracle browser / GPT-5.4 Pro follow-up: `docs/reviews/2026-04-30-metaharness-doctrine-oracle-browser.md`
+- Browser Oracle environment attempt notes: `docs/reviews/2026-04-30-metaharness-doctrine-oracle-browser-attempt.md`
 - Claude Code /interflux synthesis: `docs/research/flux-review/metaharness-doctrine-brief/2026-04-29-synthesis.md`
 - Claude Code /interflux track notes: `docs/research/flux-drive/2026-04-29-metaharness-doctrine-brief/`
 
 Run notes:
 
 - Oracle `gpt-5.4-pro` API mode was attempted first but failed for OpenRouter credit/max-token limits. Oracle review completed with API `gpt-5.4` and saved the output.
+- Browser Oracle initially failed because the zklw visible Oracle Chrome/XRDP lane was unavailable. After the lane was restored, browser Oracle completed with `gpt-5.4-pro` using visible `desktop-ops` Chrome on `127.0.0.1:9222`. The model-selector automation failed against the current ChatGPT UI, so the successful run used `--browser-model-strategy ignore`; the visible composer was already on Extended Pro.
 - Claude Code `/interflux:flux-review ... --quality=balanced` started successfully but crashed in Bun after launching early background agents. A second `/interflux:flux-review ... --quality=light` run completed after substituting economy mode because `light` is not a documented interflux quality level.
 
 ## Core convergence
@@ -109,12 +112,13 @@ Recommended handling:
 
 The review changed my ordering.
 
-### 1. Mission interview, not immediate mission draft
+### 1. Short boundary interview, not immediate mission draft
 
-Two questions still need human acceptance before root canon:
+Direct Sylveste naming is accepted for root canon. One remaining question needs human acceptance before root canon:
 
-1. Should public root docs name Sylveste directly, or reserve that for internal doctrine sections?
-2. What upstream artifact is the datum/reference for the projection — current candidate: the Hermes attention-state contract from `nousrmncr-t0q.4` / Hermes Agent `hermes-tp4`.
+1. What upstream artifact is the datum/reference for the projection — current candidate: the Hermes attention-state contract from `nousrmncr-t0q.4` / Hermes Agent `hermes-tp4`.
+
+The interview should be short and boundary-focused: confirm the projection datum, refusal/suppression wording, and whether `AGENTS.md` or `MISSION.md` is the first canonical landing point.
 
 ### 2. Boundary / promotion-gate stub
 
@@ -172,9 +176,19 @@ Adopt the framing as **candidate doctrine**, not canon:
 
 > Nousromancer is the Hermes-facing operator metaharness for Sylveste-grade work: a public Hermes dashboard extension and a private/control-surface doctrine for making multi-agent work legible through Hermes. It represents upstream work through safe read models, attention evidence, handoff/review/receipt projections, and operator asks; it does not become Sylveste, own Sylveste artifacts, or invent governance/attention truth.
 
-## 2026-04-30 follow-up: direct Sylveste naming accepted
+## 2026-04-30 follow-up: direct Sylveste naming accepted; browser Oracle completed
 
-mk accepted direct Sylveste naming for root/public canon and asked for browser Oracle rather than API-only Oracle. The browser Oracle attempt is documented separately in `docs/reviews/2026-04-30-metaharness-doctrine-oracle-browser-attempt.md`; it was blocked by the zklw browser environment because no visible Oracle Chrome/XRDP lane was available and the temporary headless Chrome path hit Cloudflare.
+mk accepted direct Sylveste naming for root/public canon and asked for browser Oracle rather than API-only Oracle. The first browser attempt is documented separately in `docs/reviews/2026-04-30-metaharness-doctrine-oracle-browser-attempt.md`; it was blocked by the unavailable visible Chrome/XRDP lane and a rejected headless workaround.
+
+After restoring the zklw visible Oracle Chrome lane, browser Oracle completed with GPT-5.4 Pro and saved `docs/reviews/2026-04-30-metaharness-doctrine-oracle-browser.md`. The successful run used visible `desktop-ops` Chrome on `127.0.0.1:9222`; current ChatGPT UI no longer exposes the expected model selector test id, so Oracle used `--browser-model-strategy ignore` while the visible composer was already on Extended Pro.
+
+The browser Oracle result converges with the API Oracle and Claude review:
+
+- adopt the metaharness framing with strict boundaries;
+- direct Sylveste naming is acceptable in root canon;
+- public wording should remain readable to non-Sylveste users;
+- Nousromancer must remain a read-only projection/adapter/control surface, not a Sylveste substrate, authority, or system of record;
+- root canon should include explicit layer discipline, anti-interpolation, absent/stale-data protocol, and refusal/suppression clauses.
 
 The naming decision supersedes the prior open question. The next canon pass should name Sylveste directly, while preserving the reviewed boundary:
 

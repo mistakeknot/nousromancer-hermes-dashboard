@@ -142,6 +142,7 @@
   const DISCORD_URL_RE = /https?:\/\/(?:canary\.|ptb\.)?discord(?:app)?\.com\/\S+/i;
   const SNOWFLAKE_RE = /\b\d{17,20}\b/;
   const TOKENISH_RE = /\b(?:github_pat_|ghp_|sk-[A-Za-z0-9_-]{8,}|token|secret|password|webhook)\b/i;
+  const FORBIDDEN_ATTENTION_COPY_RE = /\b(?:needs input|blocked on you|highest priority)\b/i;
 
   function compactText(value) {
     if (value == null) return "";
@@ -175,6 +176,12 @@
     return text;
   }
 
+  function safeAttentionDetailText(value, fallback) {
+    const text = safeDisplayText(value, "");
+    if (!text || FORBIDDEN_ATTENTION_COPY_RE.test(text)) return fallback || "";
+    return text;
+  }
+
   function safeResponseTargetPath(responseTarget) {
     if (!responseTarget || typeof responseTarget !== "object") return "";
     const path = String(responseTarget.path || "").trim();
@@ -189,7 +196,7 @@
     for (let i = 0; i < items.length; i += 1) {
       const item = items[i];
       if (!item || typeof item !== "object") continue;
-      const summary = safeDisplayText(item.summary || item.label || item.type || item.source, "");
+      const summary = safeAttentionDetailText(item.summary || item.label || item.type || item.source, "");
       if (summary) summaries.push(summary);
       if (summaries.length >= 2) break;
     }
@@ -281,7 +288,7 @@
     if (!state || state === "unknown" || state === "none" || state === "normal") return null;
     if (["possibly_waiting", "waiting_on_human", "blocked", "error"].indexOf(state) < 0) return null;
 
-    const reason = safeDisplayText(
+    const reason = safeAttentionDetailText(
       firstTextField(session, ["attention_reason", "attentionReason", "blocked_reason", "blockedReason", "error", "last_error", "lastError"]),
       "",
     );
@@ -345,12 +352,124 @@
     return SESSION_SOURCES.indexOf(source) >= 0 ? source : null;
   }
 
-  function polishSessionsDom() {
+  function queryAll(selector) {
+    if (typeof document === "undefined" || !document.querySelectorAll) return [];
+    try {
+      return Array.prototype.slice.call(document.querySelectorAll(selector) || []);
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function queryOne(selector) {
+    if (typeof document === "undefined" || !document.querySelector) return null;
+    try {
+      return document.querySelector(selector);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function escapeAttribute(value) {
+    return String(value || "").replace(/\\/g, "\\\\").replace(/"/g, "\\\"");
+  }
+
+  function rowTextMatches(row, text) {
+    if (!row || !text) return false;
+    return String(row.textContent || "").toLowerCase().indexOf(String(text).toLowerCase()) >= 0;
+  }
+
+  function findSessionRow(session) {
+    if (typeof document === "undefined" || !session) return null;
+    const id = safeDisplayText(firstTextField(session, ["id", "session_id", "sessionId"]), "");
+    if (id) {
+      const escapedId = escapeAttribute(id);
+      const idSelectors = [
+        'main [data-session-id="' + escapedId + '"]',
+        'main [data-session="' + escapedId + '"]',
+        'main [data-id="' + escapedId + '"]',
+      ];
+      for (let i = 0; i < idSelectors.length; i += 1) {
+        const exact = queryOne(idSelectors[i]);
+        if (exact) return exact;
+      }
+    }
+
+    const title = safeDisplayText(recentTitle(session), "");
+    if (!title) return null;
+    const candidates = queryAll('main [data-session-id], main [data-session], main [role="row"], main article, main li, main tr, main .cursor-pointer');
+    for (let i = 0; i < candidates.length; i += 1) {
+      if (rowTextMatches(candidates[i], title)) return candidates[i];
+    }
+    return null;
+  }
+
+  function rowAttentionContext(session) {
+    if (!session) return null;
+    let state = normalizeAttentionState(firstTextField(session, ["attention_state", "attentionState"]));
+    if (!state && (session.waiting_on_human === true || session.waitingOnHuman === true || session.requires_action === true || session.requiresAction === true)) {
+      state = "waiting_on_human";
+    }
+    if (!state || state === "unknown" || state === "none" || state === "normal") return null;
+    if (["possibly_waiting", "waiting_on_human", "blocked", "error"].indexOf(state) < 0) return null;
+
+    const reason = safeAttentionDetailText(
+      firstTextField(session, ["attention_reason", "attentionReason", "blocked_reason", "blockedReason", "error", "last_error", "lastError"]),
+      "",
+    );
+    const evidence = safeAttentionEvidenceSummary(session.attention_evidence || session.attentionEvidence);
+    const title = safeDisplayText(recentTitle(session), "Untitled session");
+    const attentionLabel = state === "possibly_waiting" ? "waiting" : attentionReasonLabel(state, reason);
+    const source = latestSessionSource(session);
+    const textParts = ["attn:" + attentionLabel];
+    if (source) textParts.push("src:" + source);
+
+    const detailParts = [];
+    if (reason) detailParts.push(reason);
+    if (evidence) detailParts.push("Evidence: " + evidence);
+    const tooltip = "Evidence-backed Hermes attention signal" +
+      (detailParts.length ? ": " + detailParts.join(" · ") : "") +
+      " in " + title + ". Not a global priority ranking.";
+
+    return {
+      label: attentionLabel,
+      text: textParts.join(" · "),
+      title: tooltip,
+    };
+  }
+
+  function upsertRowAttentionContext(row, context) {
+    if (!row || !row.querySelector) return;
+    const existing = row.querySelector('[data-nousromancer-attention-context="true"]');
+    if (!context) {
+      if (existing && existing.remove) existing.remove();
+      return;
+    }
+    if (typeof document === "undefined" || !document.createElement || !row.appendChild) return;
+    const chip = existing || document.createElement("span");
+    chip.dataset.nousromancerAttentionContext = "true";
+    chip.className = "nousromancer-row-attention-context";
+    chip.textContent = context.text;
+    chip.setAttribute("aria-label", "Hermes attention context: " + context.label);
+    chip.setAttribute("title", context.title);
+    if (!existing) row.appendChild(chip);
+  }
+
+  function polishSessionAttentionRows(sessions) {
+    const list = Array.isArray(sessions) ? sessions : [];
+    for (let i = 0; i < list.length; i += 1) {
+      const row = findSessionRow(list[i]);
+      if (!row) continue;
+      upsertRowAttentionContext(row, rowAttentionContext(list[i]));
+    }
+  }
+
+  function polishSessionsDom(sessions) {
     if (typeof document === "undefined") return;
 
     const searchInput =
-      document.querySelector('main input[data-nousromancer-search-polished="true"]') ||
-      document.querySelector('main input[placeholder="Search message content..."]');
+      queryOne('main input[data-nousromancer-search-polished="true"]') ||
+      queryOne('main input[placeholder="Search message content..."]');
     if (searchInput) {
       searchInput.placeholder = "Search session text";
       searchInput.dataset.nousromancerSearchPolished = "true";
@@ -358,7 +477,7 @@
       searchInput.setAttribute("title", "Search across session messages");
     }
 
-    const deleteButtons = document.querySelectorAll('main button[aria-label="Delete session"]');
+    const deleteButtons = queryAll('main button[aria-label="Delete session"]');
     deleteButtons.forEach(function (button) {
       button.dataset.nousromancerDangerAction = "delete";
       button.setAttribute("title", "Delete session");
@@ -375,19 +494,24 @@
       sourceBadge.setAttribute("aria-label", "Session source: " + source);
       sourceBadge.setAttribute("title", "Session source: " + source);
     });
+
+    polishSessionAttentionRows(sessions);
   }
 
-  function useSessionListPolish() {
+  function useSessionListPolish(sessions) {
     useEffect(function () {
-      polishSessionsDom();
+      function runPolish() {
+        polishSessionsDom(sessions);
+      }
+      runPolish();
       const Observer = typeof MutationObserver !== "undefined" ? MutationObserver : window.MutationObserver;
       if (!Observer || typeof document === "undefined" || !document.body) return undefined;
-      const observer = new Observer(polishSessionsDom);
+      const observer = new Observer(runPolish);
       observer.observe(document.body, { childList: true, subtree: true });
       return function () {
         observer.disconnect();
       };
-    }, []);
+    }, [sessions]);
   }
 
   function NowItem(props) {
@@ -410,10 +534,10 @@
   }
 
   function PreMainSlot() {
-    useSessionListPolish();
     const data = useMissionData();
     const status = data.status;
     const sessions = data.sessions || [];
+    useSessionListPolish(sessions);
     const count = activeSessionCount(status, sessions);
     const gatewayLive = isGatewayLive(status);
     const latest = sessions[0];

@@ -90,7 +90,7 @@
   color: #e8e8e2;
 }
 
-/* Sessions polish: turn repeated source chips into quiet metadata and hide destructive actions until intent. */
+/* Sessions polish: turn repeated source chips / attn:* attention context into quiet metadata and hide destructive actions until intent. */
 main input[data-nousromancer-search-polished="true"] {
   min-width: 18rem;
 }
@@ -112,7 +112,25 @@ main [data-nousromancer-source-chip="true"] {
   padding-right: 0 !important;
 }
 
-main .cursor-pointer:hover [data-nousromancer-source-chip="true"] {
+main [data-nousromancer-attention-context="true"] {
+  align-items: center;
+  background: transparent !important;
+  border: 1px solid rgba(199, 128, 141, 0.18) !important;
+  border-radius: 999px;
+  color: #a97e8a !important;
+  display: inline-flex;
+  font-family: var(--theme-font-mono, "Geist Mono", ui-monospace, monospace);
+  font-size: 0.55rem !important;
+  letter-spacing: 0.09em !important;
+  margin-left: 0.35rem;
+  opacity: 0.78;
+  padding: 0.06rem 0.34rem !important;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+main .cursor-pointer:hover [data-nousromancer-source-chip="true"],
+main .cursor-pointer:hover [data-nousromancer-attention-context="true"] {
   color: #9a9a92 !important;
   opacity: 0.88;
 }

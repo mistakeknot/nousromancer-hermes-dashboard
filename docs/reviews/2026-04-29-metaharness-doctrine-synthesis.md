@@ -172,8 +172,12 @@ Adopt the framing as **candidate doctrine**, not canon:
 
 > Nousromancer is the Hermes-facing operator metaharness for Sylveste-grade work: a public Hermes dashboard extension and a private/control-surface doctrine for making multi-agent work legible through Hermes. It represents upstream work through safe read models, attention evidence, handoff/review/receipt projections, and operator asks; it does not become Sylveste, own Sylveste artifacts, or invent governance/attention truth.
 
-Recommended first user-facing question after this review:
+## 2026-04-30 follow-up: direct Sylveste naming accepted
 
-> Should public root docs name Sylveste directly, or should they use public multi-agent wording while internal doctrine sections name Sylveste as the primary target?
+mk accepted direct Sylveste naming for root/public canon and asked for browser Oracle rather than API-only Oracle. The browser Oracle attempt is documented separately in `docs/reviews/2026-04-30-metaharness-doctrine-oracle-browser-attempt.md`; it was blocked by the zklw browser environment because no visible Oracle Chrome/XRDP lane was available and the temporary headless Chrome path hit Cloudflare.
 
-My recommendation remains the layered option: public docs lead with multi-agent Hermes operator language; internal canon explicitly names Sylveste as the canonical target and constrains the seam.
+The naming decision supersedes the prior open question. The next canon pass should name Sylveste directly, while preserving the reviewed boundary:
+
+> Nousromancer is the Hermes-facing operator metaharness for Sylveste-grade work, not Sylveste itself.
+
+Public/root canon should therefore be direct but bounded: name Sylveste, define Nousromancer as the Hermes-facing representation/control surface, and state what it refuses to own or expose.

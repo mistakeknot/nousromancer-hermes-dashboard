@@ -38,6 +38,9 @@ function makeElement({ textContent = '', placeholder = '', attributes = {} } = {
       if (selector === '[data-nousromancer-attention-context="true"]') {
         return this.children.find((child) => child.dataset.nousromancerAttentionContext === 'true') || null;
       }
+      if (selector === '[data-nousromancer-response-action="true"]') {
+        return this.children.find((child) => child.dataset.nousromancerResponseAction === 'true') || null;
+      }
       return null;
     },
   };
@@ -193,12 +196,109 @@ test('Nousromancer adds evidence-backed attention context to matching Sessions r
   assert.match(chip.getAttribute('title'), /Evidence-backed Hermes attention signal/i);
   assert.match(chip.getAttribute('title'), /approval requested for release merge/i);
   assert.doesNotMatch(`${chip.textContent} ${chip.getAttribute('title')}`, /needs input|blocked on you|highest priority/i);
-  assert.equal(created.length, 1, 'one chip is created for the explicit attention row');
+  const action = row.children.find((child) => child.dataset.nousromancerResponseAction === 'true');
+  assert.ok(action, 'safe response target renders a bounded row action');
+  assert.equal(action.tagName, 'A');
+  assert.equal(action.textContent, 'Respond →');
+  assert.equal(action.getAttribute('href'), '/sessions/sess-attention');
+  assert.equal(action.getAttribute('aria-label'), 'Respond from Hermes attention context');
+  assert.match(action.getAttribute('title'), /Open the dashboard-local response target/i);
+  let propagationStopped = false;
+  assert.equal(typeof action.onclick, 'function');
+  action.onclick({ stopPropagation() { propagationStopped = true; } });
+  assert.equal(propagationStopped, true, 'row action click does not bubble into the row click handler');
+  assert.doesNotMatch(`${action.textContent} ${action.getAttribute('title')} ${action.getAttribute('href')}`, /needs input|blocked on you|highest priority|discord\.com|\d{17,20}/i);
+  assert.equal(created.length, 2, 'one chip and one row action are created for the explicit attention row');
   const writesAfterFirstPass = chip.attributeWriteCount;
+  const actionWritesAfterFirstPass = action.attributeWriteCount;
   observers[0].callback();
-  assert.equal(created.length, 1, 'observer re-polish does not create duplicate attention chips');
+  assert.equal(created.length, 2, 'observer re-polish does not create duplicate attention chips/actions');
   assert.equal(row.children.filter((child) => child.dataset.nousromancerAttentionContext === 'true').length, 1);
+  assert.equal(row.children.filter((child) => child.dataset.nousromancerResponseAction === 'true').length, 1);
   assert.equal(chip.attributeWriteCount, writesAfterFirstPass, 'observer re-polish does not rewrite unchanged chip attributes');
+  assert.equal(action.attributeWriteCount, actionWritesAfterFirstPass, 'observer re-polish does not rewrite unchanged action attributes');
+});
+
+test('Nousromancer uses Inspect for explicit blocked/error row response targets', async () => {
+  const row = makeElement({ textContent: 'Runtime failure handoff' });
+  row.dataset.sessionId = 'sess-blocked';
+  const fakeDocument = {
+    body: makeElement(),
+    createElement(tagName) {
+      const element = makeElement();
+      element.tagName = String(tagName).toUpperCase();
+      return element;
+    },
+    querySelector() {
+      return null;
+    },
+    querySelectorAll(selector) {
+      if (selector === 'main button[aria-label="Delete session"]') return [];
+      if (/data-session-id|data-session|role="row"|cursor-pointer|article|li|tr/.test(selector)) return [row];
+      return [];
+    },
+  };
+
+  await runPreMainEffectsWithDocument(fakeDocument, {
+    status: { gateway_running: true, active_sessions: 1 },
+    sessions: [{
+      id: 'sess-blocked',
+      title: 'Runtime failure handoff',
+      is_active: true,
+      source: 'cli',
+      attention_state: 'blocked',
+      attention_reason: 'tool failure requires inspection',
+      response_target: { kind: 'dashboard_session', surface: 'dashboard', path: '/sessions/sess-blocked' },
+    }],
+    error: null,
+  });
+
+  const action = row.children.find((child) => child.dataset.nousromancerResponseAction === 'true');
+  assert.ok(action, 'safe blocked response target renders a bounded inspect action');
+  assert.equal(action.textContent, 'Inspect →');
+  assert.equal(action.getAttribute('href'), '/sessions/sess-blocked');
+  assert.equal(action.getAttribute('aria-label'), 'Inspect Hermes attention context');
+  assert.doesNotMatch(`${action.textContent} ${action.getAttribute('title')}`, /needs input|blocked on you|highest priority/i);
+});
+
+test('Nousromancer keeps explicit possibly-waiting row context non-actionable', async () => {
+  const row = makeElement({ textContent: 'Maybe waiting handoff' });
+  row.dataset.sessionId = 'sess-possibly-waiting';
+  const fakeDocument = {
+    body: makeElement(),
+    createElement(tagName) {
+      const element = makeElement();
+      element.tagName = String(tagName).toUpperCase();
+      return element;
+    },
+    querySelector() {
+      return null;
+    },
+    querySelectorAll(selector) {
+      if (selector === 'main button[aria-label="Delete session"]') return [];
+      if (/data-session-id|data-session|role="row"|cursor-pointer|article|li|tr/.test(selector)) return [row];
+      return [];
+    },
+  };
+
+  await runPreMainEffectsWithDocument(fakeDocument, {
+    status: { gateway_running: true, active_sessions: 1 },
+    sessions: [{
+      id: 'sess-possibly-waiting',
+      title: 'Maybe waiting handoff',
+      is_active: true,
+      source: 'discord',
+      attention_state: 'possibly_waiting',
+      attention_reason: 'assistant asked a hedged follow-up',
+      response_target: { kind: 'dashboard_session', surface: 'dashboard', path: '/sessions/sess-possibly-waiting' },
+    }],
+    error: null,
+  });
+
+  const chip = row.children.find((child) => child.dataset.nousromancerAttentionContext === 'true');
+  assert.ok(chip, 'explicit possibly-waiting row context can render as hedged metadata');
+  assert.match(chip.textContent, /attn:waiting/i);
+  assert.equal(row.children.filter((child) => child.dataset.nousromancerResponseAction === 'true').length, 0, 'hedged possibly-waiting state does not render a row action');
 });
 
 test('Nousromancer redacts authoritative attention phrases from Sessions-row attention tooltips', async () => {
@@ -277,6 +377,7 @@ test('Nousromancer redacts unsafe private handles from non-unknown Sessions-row 
       attention_evidence: [
         { type: 'assistant_prompt', source: 'session', summary: `private token ${tokenish}` },
       ],
+      response_target: { kind: 'discord', surface: 'discord', label: tokenish, path: `https://discord.com/channels/${snowflake}/${snowflake}` },
     }],
     error: null,
   });
@@ -285,8 +386,10 @@ test('Nousromancer redacts unsafe private handles from non-unknown Sessions-row 
   assert.ok(chip, 'bounded attention context still renders after private detail redaction');
   assert.match(chip.textContent, /attn:requested/i);
   const rendered = `${chip.textContent} ${chip.getAttribute('title')}`;
-  assert.doesNotMatch(rendered, new RegExp(`${snowflake}|discord\\.com/channels|github_pat_unsafeTOKEN`));
+  assert.doesNotMatch(rendered, new RegExp(`${snowflake}|discord\\.com/channels|github...OKEN`));
+  assert.equal(rendered.includes(tokenish), false);
   assert.doesNotMatch(rendered, /needs input|blocked on you|highest priority/i);
+  assert.equal(row.children.filter((child) => child.dataset.nousromancerResponseAction === 'true').length, 0, 'unsafe response target stays silent');
 });
 
 test('Nousromancer does not attach attention context by title-only or generic data-id matching when stable row IDs are absent', async () => {
@@ -356,10 +459,12 @@ test('Nousromancer removes stale Sessions-row attention context when explicit st
       source: 'discord',
       attention_state: 'waiting_on_human',
       attention_reason: 'approval requested',
+      response_target: { kind: 'dashboard_session', surface: 'dashboard', path: '/sessions/sess-state-change' },
     }],
     error: null,
   });
   assert.equal(row.children.filter((child) => child.dataset.nousromancerAttentionContext === 'true').length, 1);
+  assert.equal(row.children.filter((child) => child.dataset.nousromancerResponseAction === 'true').length, 1);
 
   await runPreMainEffectsWithDocument(fakeDocument, {
     status: { gateway_running: true, active_sessions: 1 },
@@ -373,6 +478,7 @@ test('Nousromancer removes stale Sessions-row attention context when explicit st
     error: null,
   });
   assert.equal(row.children.filter((child) => child.dataset.nousromancerAttentionContext === 'true').length, 0);
+  assert.equal(row.children.filter((child) => child.dataset.nousromancerResponseAction === 'true').length, 0);
 });
 
 test('Nousromancer suppresses Sessions-row attention context for unknown state and unsafe private handles', async () => {
@@ -415,6 +521,7 @@ test('Nousromancer suppresses Sessions-row attention context for unknown state a
   });
 
   assert.equal(row.children.filter((child) => child.dataset.nousromancerAttentionContext === 'true').length, 0);
+  assert.equal(row.children.filter((child) => child.dataset.nousromancerResponseAction === 'true').length, 0);
   const rowText = [row.textContent, ...row.children.map((child) => `${child.textContent} ${child.getAttribute('title') || ''}`)].join(' ');
   assert.doesNotMatch(rowText, new RegExp(`${snowflake}|discord\\.com/channels|sk-unsafeTOKEN`));
   assert.doesNotMatch(rowText, /needs input|blocked on you|highest priority/i);
@@ -428,6 +535,8 @@ test('Nousromancer CSS visually demotes source chips, attention context, and des
   assert.match(css, /src:discord|source chip|session source/i);
   assert.match(css, /data-nousromancer-attention-context/);
   assert.match(css, /attention context|attn:/i);
+  assert.match(css, /data-nousromancer-response-action/);
+  assert.match(css, /Respond|Inspect|response action/i);
   assert.match(css, /data-nousromancer-danger-action="delete"/);
   assert.match(css, /opacity:\s*0/);
   assert.match(css, /hover.*data-nousromancer-danger-action/s);

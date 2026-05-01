@@ -90,7 +90,7 @@
   color: #e8e8e2;
 }
 
-/* Sessions polish: turn repeated source chips / attn:* attention context into quiet metadata and hide destructive actions until intent. */
+/* Sessions polish: turn repeated source chips / attn:* attention context into quiet metadata, add explicit-contract response action affordances, and hide destructive actions until intent. */
 main input[data-nousromancer-search-polished="true"] {
   min-width: 18rem;
 }
@@ -127,6 +127,30 @@ main [data-nousromancer-attention-context="true"] {
   padding: 0.06rem 0.34rem !important;
   text-transform: uppercase;
   white-space: nowrap;
+}
+
+main [data-nousromancer-response-action="true"] {
+  align-items: center;
+  border: 1px solid rgba(216, 166, 186, 0.24) !important;
+  border-radius: 999px;
+  color: #d8a6ba !important;
+  display: inline-flex;
+  font-family: var(--theme-font-mono, "Geist Mono", ui-monospace, monospace);
+  font-size: 0.55rem !important;
+  letter-spacing: 0.09em !important;
+  margin-left: 0.35rem;
+  opacity: 0.86;
+  padding: 0.06rem 0.38rem !important;
+  text-decoration: none !important;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+main [data-nousromancer-response-action="true"]:hover,
+main [data-nousromancer-response-action="true"]:focus-visible {
+  border-color: rgba(216, 166, 186, 0.42) !important;
+  color: #e8e8e2 !important;
+  opacity: 1;
 }
 
 main .cursor-pointer:hover [data-nousromancer-source-chip="true"],

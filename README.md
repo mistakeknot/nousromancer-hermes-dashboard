@@ -5,7 +5,7 @@ Nousromancer is a minimal noir operations skin for Hermes Agent: a black technic
 - Theme: `theme/nousromancer.yaml`
 - Plugin: `plugins/nousromancer-mission-control/`
 
-The theme keeps the dashboard in the standard layout to avoid sidebar collisions with other installed plugins. The companion plugin adds a persistent Now Bar above every page: gateway health, active runs, latest trace, latest session source, data freshness, explicit Hermes session attention evidence when available, conservative `Possibly waiting` fallback hints, and the next useful action in one restrained strip. It distinguishes live gateway, stale refresh, API-error states, source context such as `src:discord`, evidence-backed attention contract signals, assistant-question fallback hints, and session error/stall evidence in text instead of color alone. It also adds a small header crest and night-ops status pill.
+The theme keeps the dashboard in the standard layout to avoid sidebar collisions with other installed plugins. The companion plugin adds a persistent Now Bar above every page: gateway health, active runs, latest trace, latest session source, data freshness, explicit Hermes session attention evidence when available, conservative `Possibly waiting` fallback hints, and the next useful action in one restrained strip. It distinguishes live gateway, stale refresh, API-error states, source context such as `src:discord`, evidence-backed attention contract signals, assistant-question fallback hints, and session error/stall evidence in text instead of color alone. On Sessions rows with stable session IDs, the plugin also adds quiet `attn:*` metadata and a bounded `Respond →` / `Inspect →` affordance only when explicit actionable contract evidence includes a safe dashboard-local `response_target.path`; hedged `possibly_waiting` row metadata stays non-actionable. It also adds a small header crest and night-ops status pill.
 
 ## Install
 
@@ -40,7 +40,7 @@ Refresh `hermes dashboard`, select `Nousromancer`, and the Now Bar appears above
 - A no-build dashboard plugin using `window.__HERMES_PLUGIN_SDK__`.
 - Slot injection into `pre-main`, `header-left`, and `header-right`.
 - A persistent Now Bar that keeps gateway health, active runs, latest trace, latest session source, data freshness, API-error state, explicit Hermes attention contract evidence, conservative `Possibly waiting` fallback hints, and the next useful action visible across routes.
-- Session-list polish that clarifies search copy, marks source chips and explicit attention context as quiet metadata, and demotes delete controls until intent.
+- Session-list polish that clarifies search copy, marks source chips and explicit attention context as quiet metadata, adds safe row-level `Respond →` / `Inspect →` affordances from actionable `response_target.path` contracts, and demotes delete controls until intent.
 - Conservative attention-hint infrastructure that prefers explicit upstream `attention_state` / `attention_reason` / `response_target` / `attention_evidence` fields, falls back to assistant question-like turns and session error/stall evidence, and preserves the no-authoritative-priority copy boundary.
 - Live data from `SDK.api.getStatus()` and `SDK.api.getSessions()`.
 - Theme/plugin composition without forking Hermes or running an npm build.

@@ -429,10 +429,16 @@
       (detailParts.length ? ": " + detailParts.join(" · ") : "") +
       " in " + title + ". Not a global priority ranking.";
 
+    let actionLabel = "";
+    if (state === "waiting_on_human") actionLabel = "Respond";
+    if (state === "blocked" || state === "error") actionLabel = "Inspect";
+
     return {
       label: attentionLabel,
       text: textParts.join(" · "),
       title: tooltip,
+      actionHref: actionLabel ? safeResponseTargetPath(session.response_target || session.responseTarget) : "",
+      actionLabel: actionLabel,
     };
   }
 
@@ -464,6 +470,46 @@
     return chip;
   }
 
+  function stopRowActionPropagation(event) {
+    if (event && event.stopPropagation) event.stopPropagation();
+  }
+
+  function upsertRowResponseAction(row, context) {
+    if (!row || !row.querySelector) return null;
+    const existing = row.querySelector('[data-nousromancer-response-action="true"]');
+    if (!context || !context.actionHref || !context.actionLabel) {
+      if (existing && existing.remove) existing.remove();
+      return null;
+    }
+    if (typeof document === "undefined" || !document.createElement || !row.appendChild) return null;
+
+    const text = context.actionLabel + " →";
+    const ariaLabel = context.actionLabel === "Respond"
+      ? "Respond from Hermes attention context"
+      : "Inspect Hermes attention context";
+    const title = "Open the dashboard-local response target from the explicit Hermes attention contract. Not a global priority ranking.";
+    if (existing &&
+        existing.textContent === text &&
+        existing.getAttribute &&
+        existing.getAttribute("href") === context.actionHref &&
+        existing.getAttribute("aria-label") === ariaLabel &&
+        existing.getAttribute("title") === title) {
+      if (existing.onclick !== stopRowActionPropagation) existing.onclick = stopRowActionPropagation;
+      return existing;
+    }
+
+    const action = existing || document.createElement("a");
+    action.dataset.nousromancerResponseAction = "true";
+    action.className = "nousromancer-row-response-action";
+    if (action.textContent !== text) action.textContent = text;
+    if (!action.getAttribute || action.getAttribute("href") !== context.actionHref) action.setAttribute("href", context.actionHref);
+    if (!action.getAttribute || action.getAttribute("aria-label") !== ariaLabel) action.setAttribute("aria-label", ariaLabel);
+    if (!action.getAttribute || action.getAttribute("title") !== title) action.setAttribute("title", title);
+    action.onclick = stopRowActionPropagation;
+    if (!existing) row.appendChild(action);
+    return action;
+  }
+
   function polishSessionAttentionRows(sessions) {
     const list = Array.isArray(sessions) ? sessions : [];
     const activeRows = typeof Set !== "undefined" ? new Set() : null;
@@ -474,10 +520,11 @@
       const context = rowAttentionContext(list[i]);
       if (context && activeRows) activeRows.add(row);
       upsertRowAttentionContext(row, context);
+      upsertRowResponseAction(row, context);
     }
 
     if (activeRows) {
-      const chips = queryAll('main [data-nousromancer-attention-context="true"]');
+      const chips = queryAll('main [data-nousromancer-attention-context="true"], main [data-nousromancer-response-action="true"]');
       chips.forEach(function (chip) {
         if (chip && chip.parentElement && !activeRows.has(chip.parentElement) && chip.remove) chip.remove();
       });

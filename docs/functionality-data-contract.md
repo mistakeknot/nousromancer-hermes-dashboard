@@ -65,7 +65,7 @@ Hermes Agent now exposes additive attention fields on session-list records. Nous
 | --- | --- | --- |
 | `attention_state` | Evidence-backed state | `unknown`/empty stays silent; `possibly_waiting` keeps hedged copy; `waiting_on_human`, `blocked`, and `error` render an `Attention: …` pill in the Now Bar and quiet `attn:<state>` metadata in matching Sessions rows without claiming global priority. |
 | `attention_reason` | Why now | Rendered only in sanitized title/tooltips, not as noisy row copy. Unsafe URLs, snowflakes, and token-like strings are suppressed. |
-| `response_target.path` | Where to answer | Used as the Now Bar CTA only when it is a safe dashboard-local path; otherwise fallback remains `/sessions`. |
+| `response_target.path` | Where to answer | Used as the Now Bar CTA and, when row identity is stable, as a bounded Sessions-row `Respond →` / `Inspect →` affordance only when the state is actionable (`waiting_on_human`, `blocked`, or `error`) and the path is safe and dashboard-local; otherwise fallback remains `/sessions` in the Now Bar and row affordance stays silent. |
 | `attention_evidence` | Evidence basis | Sanitized summaries may appear in tooltips for the Now Bar and Sessions-row context. Raw private handles and unsafe refs are not rendered. |
 
 Explicit contract signals outrank heuristic signals. Local heuristics remain fallback-only and keep the label `Possibly waiting`.
@@ -127,7 +127,7 @@ Rules:
 Current infrastructure:
 
 - **Now Bar contract signal:** explicit upstream fields render a bounded `Attention: …` / `Possibly waiting` pill and safe dashboard-local CTA when present.
-- **Sessions row context:** matching Sessions rows with stable row ID hooks get quiet `attn:<state>` and `src:<source>` metadata only from explicit non-unknown upstream attention fields; reason/evidence stay in sanitized tooltips. If row identity is unavailable, the plugin suppresses row metadata instead of matching by title text. Stable row hooks currently mean `data-session-id` or `data-session`; generic `data-id` is intentionally ignored.
+- **Sessions row context and affordance:** matching Sessions rows with stable row ID hooks get quiet `attn:<state>` and `src:<source>` metadata only from explicit non-unknown upstream attention fields; reason/evidence stay in sanitized tooltips. If the same explicit contract is actionable (`waiting_on_human`, `blocked`, or `error`) and includes a safe dashboard-local `response_target.path`, the row also gets a bounded `Respond →` / `Inspect →` affordance. If row identity is unavailable, the plugin suppresses row metadata/action instead of matching by title text. Stable row hooks currently mean `data-session-id` or `data-session`; generic `data-id` is intentionally ignored.
 - **Message-role hint:** show `Possibly waiting` when the latest meaningful session turn is assistant/agent-originated and question-like.
 - **Error/stall hint:** show `Possibly waiting` when session state/error fields indicate `stalled`, `failed`, `blocked`, degraded state, failed tools, or similar interruption evidence.
 - **Explicit upstream hook:** consume `attention_state`, `attention_reason`, `response_target`, and `attention_evidence` when Hermes exposes them. Explicit evidence outranks local heuristics, but public copy remains bounded to evidence-backed attention state, not global priority.
@@ -143,9 +143,9 @@ Current infrastructure:
    - Implemented in the Now Bar: explicit `attention_state`, `attention_reason`, `response_target`, and `attention_evidence` are consumed before heuristics.
    - Tests cover explicit attention rendering, safe response-target routing, unknown suppression, unsafe field redaction, heuristic fallback, and legacy sessions.
 
-3. **Sessions row attention context**
-   - Implemented for explicit upstream contract evidence: matching rows with stable row ID hooks receive quiet `attn:<state>` / `src:<source>` metadata and sanitized tooltips.
-   - Unknown, unsafe, or unidentifiable row evidence stays silent, and heuristics remain Now Bar fallback-only rather than row-level certainty.
+3. **Sessions row attention context and response affordance**
+   - Implemented for explicit upstream contract evidence: matching rows with stable row ID hooks receive quiet `attn:<state>` / `src:<source>` metadata, sanitized tooltips, and a bounded `Respond →` / `Inspect →` affordance when the state is actionable and `response_target.path` is safe and dashboard-local.
+   - Unknown, unsafe, unidentifiable, missing-target, or hedged `possibly_waiting` row action evidence stays silent, and heuristics remain Now Bar fallback-only rather than row-level certainty.
 
 ## Decision
 

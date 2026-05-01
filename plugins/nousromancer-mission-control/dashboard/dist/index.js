@@ -538,16 +538,16 @@
       queryOne('main input[data-nousromancer-search-polished="true"]') ||
       queryOne('main input[placeholder="Search message content..."]');
     if (searchInput) {
-      searchInput.placeholder = "Search session text";
-      searchInput.dataset.nousromancerSearchPolished = "true";
-      searchInput.setAttribute("aria-label", "Search across session messages");
-      searchInput.setAttribute("title", "Search across session messages");
+      if (searchInput.placeholder !== "Search session text") searchInput.placeholder = "Search session text";
+      if (searchInput.dataset.nousromancerSearchPolished !== "true") searchInput.dataset.nousromancerSearchPolished = "true";
+      if (!searchInput.getAttribute || searchInput.getAttribute("aria-label") !== "Search across session messages") searchInput.setAttribute("aria-label", "Search across session messages");
+      if (!searchInput.getAttribute || searchInput.getAttribute("title") !== "Search across session messages") searchInput.setAttribute("title", "Search across session messages");
     }
 
     const deleteButtons = queryAll('main button[aria-label="Delete session"]');
     deleteButtons.forEach(function (button) {
-      button.dataset.nousromancerDangerAction = "delete";
-      button.setAttribute("title", "Delete session");
+      if (button.dataset.nousromancerDangerAction !== "delete") button.dataset.nousromancerDangerAction = "delete";
+      if (!button.getAttribute || button.getAttribute("title") !== "Delete session") button.setAttribute("title", "Delete session");
 
       const rail = button.parentElement;
       if (!rail || !rail.querySelector) return;
@@ -555,11 +555,13 @@
       const source = sessionSource(sourceBadge && (sourceBadge.dataset.nousromancerSourceOriginal || sourceBadge.textContent));
       if (!source) return;
 
-      sourceBadge.dataset.nousromancerSourceOriginal = source;
-      sourceBadge.dataset.nousromancerSourceChip = "true";
-      sourceBadge.textContent = "src:" + source;
-      sourceBadge.setAttribute("aria-label", "Session source: " + source);
-      sourceBadge.setAttribute("title", "Session source: " + source);
+      const sourceText = "src:" + source;
+      const sourceLabel = "Session source: " + source;
+      if (sourceBadge.dataset.nousromancerSourceOriginal !== source) sourceBadge.dataset.nousromancerSourceOriginal = source;
+      if (sourceBadge.dataset.nousromancerSourceChip !== "true") sourceBadge.dataset.nousromancerSourceChip = "true";
+      if (sourceBadge.textContent !== sourceText) sourceBadge.textContent = sourceText;
+      if (!sourceBadge.getAttribute || sourceBadge.getAttribute("aria-label") !== sourceLabel) sourceBadge.setAttribute("aria-label", sourceLabel);
+      if (!sourceBadge.getAttribute || sourceBadge.getAttribute("title") !== sourceLabel) sourceBadge.setAttribute("title", sourceLabel);
     });
 
     polishSessionAttentionRows(sessions);

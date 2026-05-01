@@ -148,6 +148,52 @@ test('Nousromancer clarifies Sessions search copy and demotes repeated source/de
   assert.equal(observers[0].disconnected, true, 'observer is disconnected on unmount');
 });
 
+test('Nousromancer does not rewrite already-polished source chips on observer reruns', async () => {
+  const input = makeElement({ placeholder: 'Search session text' });
+  input.dataset.nousromancerSearchPolished = 'true';
+  input.setAttribute('aria-label', 'Search across session messages');
+  input.setAttribute('title', 'Search across session messages');
+
+  const sourceBadge = makeElement({ textContent: 'src:discord' });
+  sourceBadge.dataset.nousromancerSourceOriginal = 'discord';
+  sourceBadge.dataset.nousromancerSourceChip = 'true';
+  sourceBadge.setAttribute('aria-label', 'Session source: discord');
+  sourceBadge.setAttribute('title', 'Session source: discord');
+  let sourceText = 'src:discord';
+  let sourceTextWrites = 0;
+  Object.defineProperty(sourceBadge, 'textContent', {
+    get() { return sourceText; },
+    set(value) {
+      sourceTextWrites += 1;
+      sourceText = String(value);
+    },
+  });
+
+  const deleteButton = makeElement({ attributes: { 'aria-label': 'Delete session', title: 'Delete session' } });
+  deleteButton.dataset.nousromancerDangerAction = 'delete';
+  const actionRail = makeElement();
+  actionRail.querySelector = () => sourceBadge;
+  deleteButton.parentElement = actionRail;
+
+  const fakeDocument = {
+    body: makeElement(),
+    querySelector(selector) {
+      if (selector === 'main input[data-nousromancer-search-polished="true"]') return input;
+      return null;
+    },
+    querySelectorAll(selector) {
+      if (selector === 'main button[aria-label="Delete session"]') return [deleteButton];
+      return [];
+    },
+  };
+
+  const { observers, cleanups } = await runPreMainEffectsWithDocument(fakeDocument);
+  assert.equal(sourceTextWrites, 0, 'idempotent reruns should not cause childList mutations by rewriting source chip text');
+  observers[0].callback();
+  assert.equal(sourceTextWrites, 0, 'observer callback remains a no-op for already-polished source chip text');
+  cleanups.forEach((cleanup) => cleanup());
+});
+
 test('Nousromancer adds evidence-backed attention context to matching Sessions rows', async () => {
   const row = makeElement({ textContent: 'Review release decision' });
   row.dataset.sessionId = 'sess-attention';

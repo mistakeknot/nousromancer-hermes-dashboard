@@ -194,6 +194,39 @@ test('Nousromancer does not rewrite already-polished source chips on observer re
   cleanups.forEach((cleanup) => cleanup());
 });
 
+test('Nousromancer refreshes source-chip labels when Hermes reuses a Sessions row for a new source', async () => {
+  const sourceBadge = makeElement({ textContent: 'discord' });
+  const deleteButton = makeElement({ attributes: { 'aria-label': 'Delete session' } });
+  const actionRail = makeElement();
+  actionRail.querySelector = () => sourceBadge;
+  deleteButton.parentElement = actionRail;
+
+  const fakeDocument = {
+    body: makeElement(),
+    querySelector() {
+      return null;
+    },
+    querySelectorAll(selector) {
+      if (selector === 'main button[aria-label="Delete session"]') return [deleteButton];
+      return [];
+    },
+  };
+
+  const { observers, cleanups } = await runPreMainEffectsWithDocument(fakeDocument);
+  assert.equal(sourceBadge.textContent, 'src:discord');
+  assert.equal(sourceBadge.dataset.nousromancerSourceOriginal, 'discord');
+  assert.equal(sourceBadge.getAttribute('aria-label'), 'Session source: discord');
+
+  sourceBadge.textContent = 'cli';
+  observers[0].callback();
+
+  assert.equal(sourceBadge.textContent, 'src:cli');
+  assert.equal(sourceBadge.dataset.nousromancerSourceOriginal, 'cli');
+  assert.equal(sourceBadge.getAttribute('aria-label'), 'Session source: cli');
+  assert.equal(sourceBadge.getAttribute('title'), 'Session source: cli');
+  cleanups.forEach((cleanup) => cleanup());
+});
+
 test('Nousromancer adds evidence-backed attention context to matching Sessions rows', async () => {
   const row = makeElement({ textContent: 'Review release decision' });
   row.dataset.sessionId = 'sess-attention';
@@ -525,6 +558,55 @@ test('Nousromancer removes stale Sessions-row attention context when explicit st
   });
   assert.equal(row.children.filter((child) => child.dataset.nousromancerAttentionContext === 'true').length, 0);
   assert.equal(row.children.filter((child) => child.dataset.nousromancerResponseAction === 'true').length, 0);
+});
+
+test('Nousromancer removes stale Sessions-row buttons when a row is reused for a different session id', async () => {
+  const row = makeElement({ textContent: 'Reusable handoff row' });
+  row.dataset.sessionId = 'sess-old-action';
+  const fakeDocument = {
+    body: makeElement(),
+    createElement(tagName) {
+      const element = makeElement();
+      element.tagName = String(tagName).toUpperCase();
+      return element;
+    },
+    querySelector() {
+      return null;
+    },
+    querySelectorAll(selector) {
+      if (selector === 'main button[aria-label="Delete session"]') return [];
+      if (/data-session-id|data-session/.test(selector)) return [row];
+      if (/data-nousromancer-attention-context|data-nousromancer-response-action/.test(selector)) {
+        return row.children.filter((child) => child.dataset.nousromancerAttentionContext === 'true' || child.dataset.nousromancerResponseAction === 'true');
+      }
+      return [];
+    },
+  };
+
+  const missionData = {
+    status: { gateway_running: true, active_sessions: 1 },
+    sessions: [{
+      id: 'sess-old-action',
+      title: 'Old actionable row',
+      is_active: true,
+      source: 'discord',
+      attention_state: 'waiting_on_human',
+      attention_reason: 'approval requested',
+      response_target: { kind: 'dashboard_session', surface: 'dashboard', path: '/sessions/sess-old-action' },
+    }],
+    error: null,
+  };
+
+  const { observers, cleanups } = await runPreMainEffectsWithDocument(fakeDocument, missionData);
+  assert.equal(row.children.filter((child) => child.dataset.nousromancerAttentionContext === 'true').length, 1);
+  assert.equal(row.children.filter((child) => child.dataset.nousromancerResponseAction === 'true').length, 1);
+
+  row.dataset.sessionId = 'sess-new-background';
+  observers[0].callback();
+
+  assert.equal(row.children.filter((child) => child.dataset.nousromancerAttentionContext === 'true').length, 0);
+  assert.equal(row.children.filter((child) => child.dataset.nousromancerResponseAction === 'true').length, 0);
+  cleanups.forEach((cleanup) => cleanup());
 });
 
 test('Nousromancer suppresses Sessions-row attention context for unknown state and unsafe private handles', async () => {

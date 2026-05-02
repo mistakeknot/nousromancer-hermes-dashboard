@@ -353,6 +353,14 @@
     return SESSION_SOURCES.indexOf(source) >= 0 ? source : null;
   }
 
+  function sourceBadgeSource(sourceBadge) {
+    if (!sourceBadge) return null;
+    const textSource = sessionSource(sourceBadge.textContent);
+    if (textSource) return textSource;
+    const originalSource = sourceBadge.dataset ? sessionSource(sourceBadge.dataset.nousromancerSourceOriginal) : null;
+    return originalSource || null;
+  }
+
   function queryAll(selector) {
     if (typeof document === "undefined" || !document.querySelectorAll) return [];
     try {
@@ -552,7 +560,7 @@
       const rail = button.parentElement;
       if (!rail || !rail.querySelector) return;
       const sourceBadge = rail.querySelector('[data-nousromancer-source-chip="true"], .inline-flex.items-center.border');
-      const source = sessionSource(sourceBadge && (sourceBadge.dataset.nousromancerSourceOriginal || sourceBadge.textContent));
+      const source = sourceBadgeSource(sourceBadge);
       if (!source) return;
 
       const sourceText = "src:" + source;

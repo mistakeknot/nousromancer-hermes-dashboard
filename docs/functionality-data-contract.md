@@ -70,6 +70,10 @@ Hermes Agent now exposes additive attention fields on session-list records. Nous
 
 Explicit contract signals outrank heuristic signals. Local heuristics remain fallback-only and keep the label `Possibly waiting`.
 
+## Related workstream evidence contract
+
+`docs/canon/workstream-evidence-strip-contract.md` defines the boundary-safe product/data-contract pattern for market-shaped workstream evidence. It extends this file's attention-signal discipline into future candidate/retry/disagreement/evaluation evidence, while preserving the same rule: Nousromancer may surface and orient over evidence, but it must not become the router, judge, governor, allocation engine, or system of record.
+
 ## Missing signals for true cross-work triage
 
 The current public plugin still does **not** own reliable global triage for:

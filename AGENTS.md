@@ -13,6 +13,7 @@ Root doctrine for this repo lives in:
 - `docs/design-philosophy.md`
 - `docs/operator-personas-and-pain-points.md`
 - `docs/functionality-data-contract.md`
+- `docs/canon/workstream-evidence-strip-contract.md`
 
 Supporting project-docs spine:
 

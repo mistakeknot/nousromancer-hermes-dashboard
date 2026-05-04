@@ -97,6 +97,10 @@ Nousromancer fails this CUJ if it:
 - Prefer `Inspect` and `Respond` over stronger verbs like `Approve`, `Route`, or `Resolve` unless upstream contracts make those verbs true.
 - Test absent, stale, unsafe, and conflicting states as carefully as the happy path.
 
+## Proof checklist
+
+Use `docs/cujs/first-30-second-proof.md` as the small demo/review script for this CUJ. It checks whether a returning operator can choose one safe next move within 30 seconds across explicit, heuristic, stale, unknown, and unsafe/private evidence states.
+
 ## Open questions
 
 - Which upstream attention fields should become required before stronger copy is allowed?

@@ -31,6 +31,8 @@ Use these files for stable implementation boundaries:
 - `docs/architecture.md` — system layout, layer ownership, data sources, UI surfaces, and testing seams.
 - `docs/functionality-data-contract.md` — Hermes dashboard fields and attention-signal boundaries.
 - `docs/canon/` — stable standards/contracts that future docs and code should obey.
+  - `docs/canon/public-private-operator-context-boundary.md` — public/private operator-context field boundary.
+  - `docs/canon/workstream-evidence-strip-contract.md` — boundary-safe future workstream evidence pattern.
 
 A new `docs/canon/*` file should define a repeated rule, schema, contract, or promotion gate. Do not put one-off notes here.
 

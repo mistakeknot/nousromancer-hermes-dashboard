@@ -13,6 +13,7 @@ Root doctrine for this repo lives in:
 - `docs/design-philosophy.md`
 - `docs/operator-personas-and-pain-points.md`
 - `docs/functionality-data-contract.md`
+- `docs/canon/public-private-operator-context-boundary.md`
 - `docs/canon/workstream-evidence-strip-contract.md`
 
 Supporting project-docs spine:
@@ -47,6 +48,8 @@ Agents must preserve these boundaries:
 - **Nousromancer** presents, orients, and stages operator action over Hermes data.
 - **Beads** tracks project work and issue state.
 - **Sylveste / Interverse / Ockham / Clavain / future substrate layers** may own deeper canon, governance, routing, provenance, review, or durable coordination semantics.
+
+Use `docs/canon/public-private-operator-context-boundary.md` before adding richer operator-context fields from Beads, Masaq/GSV, Sylveste, Ockham, Clavain, Interverse, or future coordination substrates to public dashboard copy, screenshots, or product claims.
 
 Do not add code or copy that implies Nousromancer owns durable Sylveste truth unless an upstream contract explicitly grants that role.
 

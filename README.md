@@ -63,6 +63,7 @@ scripts/install.sh
 - `AGENTS.md`, `CLAUDE.md` — agent operating guidance.
 - `docs/architecture.md` — theme/plugin/data-flow boundaries.
 - `docs/functionality-data-contract.md` — Hermes dashboard fields and attention-signal boundaries.
+- `docs/canon/public-private-operator-context-boundary.md` — public/private operator-context field boundary.
 - `docs/canon/workstream-evidence-strip-contract.md` — boundary-safe future workstream evidence pattern.
 - `docs/roadmap.md` — post-hackathon product sequence.
 - `docs/cujs/operator-reorientation.md` — primary operator journey.

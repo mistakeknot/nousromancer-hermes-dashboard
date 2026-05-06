@@ -74,6 +74,8 @@ Explicit contract signals outrank heuristic signals. Local heuristics remain fal
 
 `docs/canon/workstream-evidence-strip-contract.md` defines the boundary-safe product/data-contract pattern for market-shaped workstream evidence. It extends this file's attention-signal discipline into future candidate/retry/disagreement/evaluation evidence, while preserving the same rule: Nousromancer may surface and orient over evidence, but it must not become the router, judge, governor, allocation engine, or system of record.
 
+`docs/canon/public-private-operator-context-boundary.md` defines which richer operator-context fields are public-safe, private-only, or forbidden/leaky. It is the promotion gate before Beads, Masaq/GSV, Sylveste, Ockham, Clavain, or other upstream coordination context appears in public dashboard copy or screenshots.
+
 ## Missing signals for true cross-work triage
 
 The current public plugin still does **not** own reliable global triage for:

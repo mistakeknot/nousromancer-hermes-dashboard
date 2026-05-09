@@ -303,12 +303,19 @@
       (detailParts.length ? ": " + detailParts.join(" · ") : "") +
       " in " + title + ". Not a global priority ranking.";
 
+    const safeTargetPath = safeResponseTargetPath(session.response_target || session.responseTarget);
+    const actionLabel = safeTargetPath && state === "waiting_on_human"
+      ? "Respond"
+      : safeTargetPath && (state === "blocked" || state === "error")
+        ? "Inspect"
+        : "Trace";
+
     return {
       label: label,
       tone: state === "error" || state === "blocked" ? "warn" : "attention",
       title: tooltip,
-      actionHref: safeResponseTargetPath(session.response_target || session.responseTarget),
-      actionLabel: "Respond",
+      actionHref: actionLabel === "Respond" || actionLabel === "Inspect" ? safeTargetPath : "",
+      actionLabel: actionLabel,
     };
   }
 

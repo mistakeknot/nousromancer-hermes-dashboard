@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
+import { paginatedSessionsApiFixture, sessionApiFixtureMatrix, unsafeFixtureParts } from './fixtures/nousromancer-api-sessions.mjs';
 
 const PLUGIN_PATH = new URL('../plugins/nousromancer-mission-control/dashboard/dist/index.js', import.meta.url);
 const README_PATH = new URL('../README.md', import.meta.url);
@@ -15,7 +16,9 @@ function flattenText(node) {
 
 function collectLinks(node, links = []) {
   if (node == null || typeof node !== 'object') return links;
-  if (node.type === 'a') links.push(node.props || {});
+  if (node.type === 'a') {
+    links.push({ ...(node.props || {}), text: flattenText(node.children || []).join(' ') });
+  }
   for (const child of node.children || []) collectLinks(child, links);
   return links;
 }
@@ -292,6 +295,112 @@ test('pre-main Now Bar omits possible-attention hints when evidence is insuffici
 
   assert.doesNotMatch(text, /Possibly waiting/i);
   assert.doesNotMatch(text, /needs input|blocked on you|highest priority/i);
+});
+
+test('pre-main Now Bar exercises public-safe /api/sessions fixture matrix', async () => {
+  assert.equal(paginatedSessionsApiFixture.sessions.length, 8, 'fixture keeps the Phase 2 evidence matrix explicit');
+
+  const cases = [
+    {
+      name: 'explicit waiting_on_human',
+      session: sessionApiFixtureMatrix.explicit,
+      text: /Attention: approval/i,
+      actionText: /Respond/i,
+      href: '/sessions/sess-explicit-waiting',
+    },
+    {
+      name: 'explicit blocked',
+      session: sessionApiFixtureMatrix.blocked,
+      text: /Attention: blocked/i,
+      actionText: /Inspect/i,
+      href: '/sessions/sess-explicit-blocked',
+    },
+    {
+      name: 'explicit error',
+      session: sessionApiFixtureMatrix.error,
+      text: /Attention: error/i,
+      actionText: /Inspect/i,
+      href: '/sessions/sess-explicit-error',
+    },
+    {
+      name: 'explicit possibly_waiting',
+      session: sessionApiFixtureMatrix.possiblyWaiting,
+      text: /Possibly waiting/i,
+      actionText: /Trace/i,
+      href: '/sessions',
+      absentHref: '/sessions/sess-explicit-possibly-waiting',
+    },
+    {
+      name: 'heuristic question-like fallback',
+      session: sessionApiFixtureMatrix.heuristic,
+      text: /Possibly waiting/i,
+      actionText: /Trace/i,
+      href: '/sessions',
+      absentHref: '/sessions/sess-heuristic-question',
+    },
+    {
+      name: 'unknown attention state',
+      session: sessionApiFixtureMatrix.unknown,
+      noText: /Attention:|Possibly waiting/i,
+      actionText: /Trace/i,
+      href: '/sessions',
+    },
+    {
+      name: 'absent attention evidence',
+      session: sessionApiFixtureMatrix.absent,
+      noText: /Attention:|Possibly waiting/i,
+      actionText: /Trace/i,
+      href: '/sessions',
+    },
+    {
+      name: 'unsafe private target',
+      session: sessionApiFixtureMatrix.unsafePrivate,
+      text: /Attention: requested/i,
+      actionText: /Trace/i,
+      href: '/sessions',
+      absentHref: `https://discord.com/channels/${unsafeFixtureParts.snowflake}/${unsafeFixtureParts.snowflake}`,
+    },
+  ];
+
+  for (const item of cases) {
+    const node = await renderRegisteredSlot('pre-main', {
+      status: { gateway_running: true, active_sessions: 1, version: '0.11.0' },
+      sessions: [item.session],
+      error: null,
+      refreshedAt: '2026-05-09T04:00:00.000Z',
+      nowMs: Date.parse('2026-05-09T04:02:00.000Z'),
+    });
+    const text = flattenText(node).join(' ');
+    const links = collectLinks(node);
+    const action = links[links.length - 1];
+
+    if (item.text) assert.match(text, item.text, item.name);
+    if (item.noText) assert.doesNotMatch(text, item.noText, item.name);
+    assert.match(text, /Updated 2m/i, `${item.name}: fixture carries fresh refresh state`);
+    assert.match(action.text, item.actionText, `${item.name}: action label`);
+    assert.equal(action.href, item.href, `${item.name}: action href`);
+    assert.doesNotMatch(text, /needs input|blocked on you|highest priority/i, `${item.name}: bounded copy`);
+    if (item.absentHref) assert.ok(!links.some((link) => link.href === item.absentHref), `${item.name}: unsafe or unsupported target suppressed`);
+    if (item.session === sessionApiFixtureMatrix.unsafePrivate) {
+      await assertNoUnsafeNowBarLeak(node, [unsafeFixtureParts.snowflake, 'discord\\.com/channels', unsafeFixtureParts.tokenish]);
+    }
+  }
+});
+
+test('pre-main Now Bar fixture covers stale refresh separately from fresh attention evidence', async () => {
+  const node = await renderRegisteredSlot('pre-main', {
+    status: { gateway_running: true, active_sessions: 1, version: '0.11.0' },
+    sessions: [sessionApiFixtureMatrix.explicit],
+    error: null,
+    refreshedAt: '2026-05-09T04:00:00.000Z',
+    nowMs: Date.parse('2026-05-09T04:20:00.000Z'),
+  });
+  const text = flattenText(node).join(' ');
+  const links = collectLinks(node);
+
+  assert.match(text, /Stale 20m/i);
+  assert.match(text, /Attention: approval/i, 'explicit evidence remains visible but paired with stale freshness text');
+  assert.ok(links.some((link) => link.href === '/sessions/sess-explicit-waiting'));
 });
 
 test('README explains the Now Bar usefulness in judge-scannable language', async () => {
